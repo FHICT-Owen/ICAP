@@ -1,7 +1,9 @@
 ---
 name: User Story
-
 about: Create a user story to describe a new feature or improvement
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
@@ -44,4 +46,3 @@ As a [type of user], I want [an action] so that [benefit/value].
 ### Epic
 
 [Link to the epic or larger project that this user story is a part of, if applicable.]
-
