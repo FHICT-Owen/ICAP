@@ -2,8 +2,8 @@
 name: User Story
 about: Create a user story to describe a new feature or improvement
 title: ''
-labels: ''
-assignees: ''
+labels: user story
+assignees: OwendB1
 
 ---
 
