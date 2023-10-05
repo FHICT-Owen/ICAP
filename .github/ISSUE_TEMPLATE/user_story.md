@@ -24,10 +24,12 @@ As a [type of user], I want [an action] so that [benefit/value].
 ### Definition of Done
 
 - [ ] Code is written or updated.
+- [ ] Code compiles without errors.
+- [ ] Security first considered for GDPR compliance.
 - [ ] Tests have been added or updated to cover the changes.
 - [ ] Documentation has been updated if necessary.
-- [ ] Code has been reviewed and approved.
 - [ ] User testing has been conducted and successful.
+- [ ] Non-Functional requirements met.
 
 ### Tasks
 
