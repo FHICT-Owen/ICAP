@@ -15,8 +15,8 @@ There are three general styles of event processing: simple, stream, and complex.
 
 The benefits of EDA derive from how systems and components are loosely coupled. This can facilitate independent development and deployment of systems, improved scaling and fault tolerance, and integration with external systems. However, it's important to note that adopting an EDA may require rethinking how you view your application design. For example, workloads that require consistent low-latency performance are not good candidates for EDA. Also, with many events flowing through different services in an architecture at any given point of time, such workloads often require eventual consistency, making it more complex to process transactions, handle duplicates, or determine the exact overall state of a system. [Amazon AWS](aws.amazon.com)
 
-### Microservices or serverless compute?
-Both Microservices and servless compute can be set up to work with EDA, but which one should be chosen when it comes to ICAP's requirements? To summarize the general consensus around the choice between the two architectures is that serverless architecture is a good choice if you need a fast, event-driven application. Microservices are a good choice if you need a highly available application to handle a lot of traffic.
+### Prioritize microservices or serverless compute?
+Both Microservices and serverless compute can be set up to work with EDA, but which one should be chosen when it comes to ICAP's requirements? To summarize the general consensus around the choice between the two architectures is that serverless architecture is a good choice if you need a fast, event-driven application. Microservices are a good choice if you need a highly available application to handle a lot of traffic.
 
 The microservice architecture is more distributed, where each service is its self-contained unit. This can make development and deployment more complex and provide more flexibility and scalability.
 
@@ -27,17 +27,13 @@ Serverless functions have a set time limit that they can run for, known as their
 Microservices have an advantage over serverless architectures because vendors' requirements do not limit them to runtime, storage space, and RAM. This is especially beneficial for complex, long-term operations that involve storing and manipulating huge amounts of data.
 
 ## Conclusion about architecture design choices
-When it comes to ICAP's goal and requirements and the information given above, the combination of event-driven architecture with microservices would be a better fit for the project at a first glance. This is due to the needs of creating message functionality and persisting and live updating lots of forum data. 
+When it comes to ICAP's goal and requirements and the information given above, the use of microservices should be prioritised over serverless compute. This is due to the needs of creating message functionality and persisting and live updating lots of forum data. Serverless compute also has its niche and will also most likely be used within the project for certain functions.
 
 ## Next steps
 The next step would be to choose an appropriate programming language that fits the needs for the project and the semester. When choosing a programming language for microservices architectures combined with event-driven architecture, there are several languages that stand out due to their robust support for concurrency, distributed systems, and event-driven programming. Here are a few of them:
 
 - Java: Java, with the Spring Boot framework, provides support for building microservices and can handle event-driven architectures effectively. The Spring framework has projects like Spring AMQP and Spring for Apache Kafka that help in creating Kafka- or RabbitMQ-based messaging solutions spring.io. Java's robustness, maturity, and wide community support make it a good choice for such architectures.
 - C# (.NET): .NET provides a framework for building microservices. It supports asynchronous programming and event-driven architecture with the help of message brokers and service buses like Azure Service Bus, RabbitMQ, NServiceBus, MassTransit, or Brighter learn.microsoft.com.
-- Python: Python is a versatile language that can be used for microservices and event-driven architectures. With libraries like Nameko for building microservices and Pykka for actor-based concurrency (a model often used in event-driven systems), Python is a good choice for such architectures.
 - Node.js: Node.js is built around an event-driven, non-blocking I/O model, making it suitable for data-intensive, real-time applications. Its ability to handle multiple concurrent connections with a single server process makes it a great choice for microservices architecture.
-- Go: Go (Golang) is a statically typed, compiled language that has built-in support for concurrent programming. It's used by companies like Google, Uber, and Twitch for their microservices due to its simplicity, performance, and strong support for concurrency.
-- Kotlin: Kotlin is a statically typed language that runs on the JVM and can be used to develop Spring Boot microservices. It supports coroutines, which makes it easier to write asynchronous and non-blocking code, a key requirement for event-driven systems.
-- Rust: Rust is a systems programming language that guarantees thread safety. Its performance characteristics make it suitable for building high-performance microservices.
 
 It's also worth noting that the choice of language will depend on the main developer's expertise and how they want to challenge themselves within the current semester.
