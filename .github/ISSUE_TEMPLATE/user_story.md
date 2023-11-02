@@ -17,9 +17,27 @@ As a [type of user], I want [an action] so that [benefit/value].
 
 ### Acceptance Criteria
 
-- [ ] [Acceptance criteria 1: Describe a specific condition or action that must be met for this user story to be considered complete.]
-- [ ] [Acceptance criteria 2: Describe another specific condition or action that must be met for this user story to be considered complete.]
-- [ ] [Acceptance criteria 3: Describe additional specific conditions or actions if necessary.]
+- [ ] Acceptance criteria 1:
+```
+Given ...
+When ...
+Then ...
+(And, But)
+```
+- [ ] Acceptance criteria 2: 
+```
+Given ...
+When ...
+Then ...
+(And, But)
+```
+- [ ] Acceptance criteria 3:
+```
+Given ...
+When ...
+Then ...
+(And, But)
+```
 
 ### Definition of Done
 
@@ -33,18 +51,11 @@ As a [type of user], I want [an action] so that [benefit/value].
 
 ### Tasks
 
-- [ ] [Task 1: List any specific tasks that need to be completed to implement this user story.]
-- [ ] [Task 2: List another task if needed.]
-- [ ] [Task 3: List additional tasks as necessary.]
+- [ ] Task 1: List any specific tasks that need to be completed to implement this user story.
+- [ ] Task 2: List another task if needed.
+- [ ] Task 3: List additional tasks as necessary.
 
 ### Related Issues/PRs
 
 [Link to any related issues or pull requests if applicable]
 
-### Additional Information
-
-[Provide any additional context, information, or resources that may be helpful in completing this user story.]
-
-### Epic
-
-[Link to the epic or larger project that this user story is a part of, if applicable.]
