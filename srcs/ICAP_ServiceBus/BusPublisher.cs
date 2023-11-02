@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
-using Microsoft.Azure.ServiceBus;
+using Azure.Messaging.ServiceBus;
 
 namespace ICAP_ServiceBus
 {
@@ -15,11 +15,14 @@ namespace ICAP_ServiceBus
 
         public async Task SendMessageAsync<T>(T serviceBusMessage, string topicName)
         {
-            var queueClient = new QueueClient(_connectionString, topicName);
+            var client = new ServiceBusClient(_connectionString, new ServiceBusClientOptions
+            {
+                ConnectionIdleTimeout = TimeSpan.FromMinutes(5),
+            });
+            var sender = client.CreateSender(topicName);
             var messageBody = JsonSerializer.Serialize(serviceBusMessage);
-            var message = new Message(Encoding.UTF8.GetBytes(messageBody));
-
-            await queueClient.SendAsync(message);
+            var message = new ServiceBusMessage(Encoding.UTF8.GetBytes(messageBody));
+            await sender.SendMessageAsync(message);
         }
     }
 }

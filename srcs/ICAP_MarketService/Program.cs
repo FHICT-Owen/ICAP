@@ -1,7 +1,6 @@
 using Azure.Identity;
 using ICAP_ServiceBus;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
@@ -9,8 +8,10 @@ builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredent
 
 // Add services to the container.
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers(options =>
+{
+    options.SuppressAsyncSuffixInActionNames = false;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
