@@ -4,23 +4,19 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>65a3b67f-2b07-4442-b8da-7d64415b72b9</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.0.0" />
-    <PackageReference Include="Azure.Identity" Version="1.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.13" />
-    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="5.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\ICAP_ServiceBus\ICAP_ServiceBus.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ICAP_ServiceBus\ICAP_ServiceBus.csproj" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

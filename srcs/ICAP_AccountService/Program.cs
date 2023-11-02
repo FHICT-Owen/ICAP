@@ -1,7 +1,6 @@
 using Azure.Identity;
 using ICAP_ServiceBus;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
