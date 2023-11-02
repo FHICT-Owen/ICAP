@@ -5,11 +5,11 @@ name: .NET
 
 on:
   push:
-    branches: "development"
+    branches: "production"
     paths:
       - "srcs/**"
   workflow_dispatch:
-  
+
 jobs:
   filter:
     runs-on: ubuntu-latest

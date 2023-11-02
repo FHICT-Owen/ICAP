@@ -4,12 +4,12 @@
 name: .NET
 
 on:
-  push:
-    branches: "development"
+  pull_request:
+    branches: "production"
     paths:
       - "srcs/**"
   workflow_dispatch:
-  
+
 jobs:
   filter:
     runs-on: ubuntu-latest
@@ -65,3 +65,17 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         projectBaseDir: "./srcs/${{ matrix.service }}"
+
+  deploy: 
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [client, accountservice, friendservice, marketservice, servicebus] # Add more services as needed
+    if: ${{ needs.filter.outputs[matrix.service] == 'true' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to Development Environment
+        run: |
+          echo "Deploying to development environment..."
+          # Your deployment commands go here  
