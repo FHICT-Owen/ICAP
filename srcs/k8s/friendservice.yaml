@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: friendservice
+    version: "1.0"
+  name: friendservice
+  namespace: icap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: friendservice
+      version: "1.0"
+  template:
+    metadata:
+      labels:
+        app: friendservice
+        version: "1.0"
+    spec:
+      containers:
+      - env:
+        - name: DOTNET_ENVIRONMENT
+          value: Production
+        image: icap/friendservice:1.0
+        imagePullPolicy: IfNotPresent
+        name: friendservice
+        ports:
+        - containerPort: 5100
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: friendservice
+  name: friendservice
+  namespace: icap
+spec:
+  type: NodePort
+  ports:
+  - name: "http-5100"
+    port: 5100
+    targetPort: 5100
+  selector:
+    app: friendservice

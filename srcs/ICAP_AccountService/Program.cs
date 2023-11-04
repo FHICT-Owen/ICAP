@@ -1,5 +1,7 @@
 using Azure.Identity;
+using ICAP_AccountService.Events;
 using ICAP_ServiceBus;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,13 +12,21 @@ builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredent
 
 builder.Services.AddControllers(options =>
 {
-    options.SuppressAsyncSuffixInActionNames = false;
+    options.SuppressAsyncSuffixInActionNames = true;
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.UseAzureServiceBusPublisher(builder.Configuration);
 builder.Services.UseAzureServiceBusHandler(builder.Configuration);
+
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var mongoClient = new MongoClient(builder.Configuration.GetValue<string>("MongoURL"));
+    return mongoClient.GetDatabase("Account");
+});
+
+builder.Services.AddSingleton<FriendRequestAccepted>();
 
 var app = builder.Build();
 

@@ -1,6 +1,6 @@
 ﻿namespace ICAP_AccountService.Entities
 {
-    public class User
+    public class User : IStringEntity
     {
         public string Id { get; set; }
         public string Name { get; set; }

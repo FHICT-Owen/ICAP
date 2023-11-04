@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace ICAP_AccountService.Controllers
 {
     [ApiController]
-    [Route("friendrequests")]
+    [Route("users")]
     public class UsersController : ControllerBase
     {
-        private readonly UsersRepository _usersRepository = new();
+        private readonly MongoRepository _usersRepository = new();
 
         [HttpGet]
         public async Task<IEnumerable<User>> GetAsync()

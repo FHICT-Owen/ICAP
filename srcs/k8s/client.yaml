@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: client
+    version: "1.0"
+  name: client
+  namespace: icap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+      version: "1.0"
+  template:
+    metadata:
+      labels:
+        app: client
+        version: "1.0"
+    spec:
+      containers:
+      - env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Production
+        image: icap/client:1.0
+        imagePullPolicy: IfNotPresent
+        name: client
+        ports:
+        - containerPort: 7005
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: client
+  name: client
+  namespace: icap
+spec:
+  type: LoadBalancer
+  ports:
+  - name: "7005"
+    port: 7005
+    targetPort: 7005
+  selector:
+    app: client

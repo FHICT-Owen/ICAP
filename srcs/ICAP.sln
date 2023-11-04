@@ -6,11 +6,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_Client", "ICAP_Client\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_MarketService", "ICAP_MarketService\ICAP_MarketService.csproj", "{8474A43A-9B57-4136-9C84-C9E441DD862A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_AccountService", "ICAP_AccountService\ICAP_AccountService.csproj", "{187D067E-F841-4917-87FC-19E1E0B6A214}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_AccountService", "ICAP_AccountService\ICAP_AccountService.csproj", "{187D067E-F841-4917-87FC-19E1E0B6A214}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_ServiceBus", "ICAP_ServiceBus\ICAP_ServiceBus.csproj", "{4EF3E689-0DD3-412C-8C80-7433A9469F43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_ServiceBus", "ICAP_ServiceBus\ICAP_ServiceBus.csproj", "{4EF3E689-0DD3-412C-8C80-7433A9469F43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_FriendService", "ICAP_FriendService\ICAP_FriendService.csproj", "{10C4776A-C406-4EAB-93FD-E61CDB1D3064}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_FriendService", "ICAP_FriendService\ICAP_FriendService.csproj", "{10C4776A-C406-4EAB-93FD-E61CDB1D3064}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
