@@ -1,6 +1,8 @@
-﻿namespace ICAP_FriendService.Entities
+﻿using ICAP_AccountService.Entities;
+
+namespace ICAP_FriendService.Entities
 {
-    public class FriendRequest
+    public class FriendRequest : IEntity
     {
         public Guid Id { get; set; }
         public string UserFrom { get; set; }
