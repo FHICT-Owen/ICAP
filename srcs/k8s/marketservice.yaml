@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: marketservice
+    version: "1.0"
+  name: marketservice
+  namespace: icap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: marketservice
+      version: "1.0"
+  template:
+    metadata:
+      labels:
+        app: marketservice
+        version: "1.0"
+    spec:
+      containers:
+      - env:
+        - name: DOTNET_ENVIRONMENT
+          value: Production
+        image: icap/marketservice:1.0
+        imagePullPolicy: IfNotPresent
+        name: marketservice
+        ports:
+        - containerPort: 5200
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: marketservice
+  name: marketservice
+  namespace: icap
+spec:
+  type: NodePort
+  ports:
+  - name: "http-5200"
+    port: 5200
+    targetPort: 5200
+  selector:
+    app: marketservice

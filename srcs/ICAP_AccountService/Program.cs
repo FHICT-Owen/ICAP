@@ -1,4 +1,7 @@
 using Azure.Identity;
+using ICAP_AccountService.Entities;
+using ICAP_AccountService.Events;
+using ICAP_Infrastructure.Repositories;
 using ICAP_ServiceBus;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +20,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.UseAzureServiceBusPublisher(builder.Configuration);
 builder.Services.UseAzureServiceBusHandler(builder.Configuration);
+
+builder.Services.AddMongo()
+    .AddMongoRepository<User>("users");
+
+builder.Services.AddSingleton<FriendRequestAccepted>();
 
 var app = builder.Build();
 

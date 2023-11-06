@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>65a3b67f-2b07-4442-b8da-7d64415b72b9</UserSecretsId>
+    <UserSecretsId>0cacfb5d-a564-4610-a8ad-13a05a3dd5fb</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,11 +12,8 @@
     <PackageReference Include="Azure.Identity" Version="1.10.3" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.16.2" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.13" />
+    <PackageReference Include="MongoDB.Driver" Version="2.22.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
   <ItemGroup>

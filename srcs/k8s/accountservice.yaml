@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: accountservice
+    version: "1.0"
+  name: accountservice
+  namespace: icap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: accountservice
+      version: "1.0"
+  template:
+    metadata:
+      labels:
+        app: accountservice
+        version: "1.0"
+    spec:
+      containers:
+      - env:
+        - name: DOTNET_ENVIRONMENT
+          value: Production
+        image: icap/accountservice:1.0
+        imagePullPolicy: IfNotPresent
+        name: accountservice
+        ports:
+        - containerPort: 5000
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: accountservice
+  name: accountservice
+  namespace: icap
+spec:
+  type: NodePort
+  ports:
+  - name: "http-5000"
+    port: 5000
+    targetPort: 5000
+  selector:
+    app: accountservice

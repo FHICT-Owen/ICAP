@@ -1,0 +1,83 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Pull Request DEV
+
+on:
+  pull_request:
+    branches: "production"
+    paths:
+      - "srcs/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+jobs:
+  filter:
+    runs-on: ubuntu-latest
+    outputs:
+      client: ${{ steps.filter.outputs.client }}
+      accountservice: ${{ steps.filter.outputs.accountservice }}
+      friendservice: ${{ steps.filter.outputs.friendservice }}
+      marketservice: ${{ steps.filter.outputs.marketservice }}
+      servicebus: ${{ steps.filter.outputs.servicebus }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          client:
+            - 'srcs/ICAP_Client/**'
+          accountservice:
+            - 'srcs/ICAP_AccountService/**'
+          friendservice:
+            - 'srcs/ICAP_Client/**'
+          marketservice:
+            - 'srcs/ICAP_MarketService/**'
+          servicebus:
+            - 'srcs/ICAP_ServiceBus/**'
+            
+  build-and-test:
+    needs: filter
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [client, accountservice, friendservice, marketservice, servicebus]
+    if: ${{ needs.filter.outputs[matrix.service] == 'true' }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '7.0.x'
+    - name: Build
+      run: |
+        cd ./srcs/${{ matrix.service }}
+        dotnet build --no-restore $(ls *.csproj)
+
+    - name: Unit Tests
+      run: |
+        cd ./srcs/${{ matrix.service }}
+        dotnet test --no-build $(ls *.csproj)
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        projectBaseDir: "./srcs/${{ matrix.service }}"
+
+  deploy: 
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [client, accountservice, friendservice, marketservice, servicebus]
+    if: ${{ needs.filter.outputs[matrix.service] == 'true' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to Development Environment
+        run: |
+          echo "Deploying to development environment..."
+          # Your deployment commands go here  
