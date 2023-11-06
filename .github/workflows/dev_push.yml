@@ -41,13 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service:
-          - client
-          - accountservice
-          - friendservice
-          - marketservice
-          - servicebus
-    if: ${{ needs.filter.outputs[matrix.service] == 'true' }}
+        service: [client, accountservice, friendservice, marketservice, servicebus]
+    if: ${{ needs.filter.outputs[build-and-test.matrix.service] == 'true' }}
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
