@@ -15,27 +15,24 @@ jobs:
   filter:
     runs-on: ubuntu-latest
     outputs:
-      client: ${{ steps.filter.outputs.client }}
-      accountservice: ${{ steps.filter.outputs.accountservice }}
-      friendservice: ${{ steps.filter.outputs.friendservice }}
-      marketservice: ${{ steps.filter.outputs.marketservice }}
-      relationservice: ${{ steps.filter.outputs.relationservice }}
-      servicebus: ${{ steps.filter.outputs.servicebus }}
+      ICAP_Client: ${{ steps.filter.outputs.ICAP_Client }}
+      ICAP_AccountService: ${{ steps.filter.outputs.ICAP_AccountService }}
+      ICAP_MarketService: ${{ steps.filter.outputs.ICAP_MarketService }}
+      ICAP_RelationService: ${{ steps.filter.outputs.ICAP_RelationService }}
+      ICAP_ServiceBus: ${{ steps.filter.outputs.ICAP_ServiceBus }}
     steps:
     - uses: actions/checkout@v2
     - uses: dorny/paths-filter@v2
       id: filter
       with:
         filters: |
-          client:
+          ICAP_Client:
             - 'srcs/ICAP_Client/**'
           accountservice:
             - 'srcs/ICAP_AccountService/**'
-          friendservice:
-            - 'srcs/ICAP_Client/**'
           marketservice:
             - 'srcs/ICAP_MarketService/**'
-          relationservice:
+          ICAP_RelationService:
             - 'srcs/ICAP_RelationService/**'
           servicebus:
             - 'srcs/ICAP_ServiceBus/**'
@@ -44,28 +41,28 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        services: [client, accountservice, friendservice, marketservice, relationservice, servicebus]
-    if: needs.filter.outputs[matrix.services] == 'true'
+        services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService, ICAP_ServiceBus]
     steps:
-    - name: Echo outputs
-      run: |
-        echo "Test: ${{ needs.filter.outputs[matrix.services] }}"
     - uses: actions/checkout@v2
     - name: Setup .NET Core
+      if: needs.filter.outputs[matrix.service] == 'true' 
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '7.0.x'
     - name: Build
+      if: needs.filter.outputs[matrix.service] == 'true' 
       run: |
         cd ./srcs/${{ matrix.services }}
         dotnet build --no-restore $(ls *.csproj)
 
     - name: Unit Tests
+      if: needs.filter.outputs[matrix.service] == 'true' 
       run: |
         cd ./srcs/${{ matrix.services }}
         dotnet test --no-build $(ls *.csproj)
 
     - name: SonarCloud Scan
+      if: needs.filter.outputs[matrix.service] == 'true' 
       uses: SonarSource/sonarcloud-github-action@master
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
