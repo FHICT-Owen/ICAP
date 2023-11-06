@@ -45,7 +45,6 @@ jobs:
     strategy:
       matrix:
         services: [client, accountservice, friendservice, marketservice, servicebus]
-    steps:
     if: ${{ needs.filter.outputs[matrix['services']] == 'true' }}
     steps:
     - uses: actions/checkout@v2
