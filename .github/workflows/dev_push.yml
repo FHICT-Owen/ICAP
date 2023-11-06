@@ -45,8 +45,11 @@ jobs:
     strategy:
       matrix:
         services: [client, accountservice, friendservice, marketservice, servicebus]
-    if: ${{ needs.filter.outputs[matrix['services']] == 'true' }}
+    #if: ${{ needs.filter.outputs[matrix['services']] == 'true' }}
     steps:
+    - name: Echo outputs
+      run: |
+        echo "Test: ${{ needs.filter.outputs[matrix.services] }}"
     - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
