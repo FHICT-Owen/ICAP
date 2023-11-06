@@ -36,6 +36,7 @@ jobs:
             - 'srcs/ICAP_RelationService/**'
           ICAP_ServiceBus:
             - 'srcs/ICAP_ServiceBus/**'
+        base: 'development'
 
   sonarcloud-analysis:
     needs: filter
