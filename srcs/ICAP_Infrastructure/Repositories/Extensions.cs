@@ -29,7 +29,7 @@ namespace ICAP_Infrastructure.Repositories
         }
 
         public static IServiceCollection AddMongoRepository<T>(this IServiceCollection services, string collectionName)
-            where T : IEntity, IStringEntity
+            where T : IEntity
         {
             services.AddSingleton<IRepository<T>>(serviceProvider =>
             {

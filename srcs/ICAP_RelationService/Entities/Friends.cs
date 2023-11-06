@@ -1,6 +1,6 @@
 ﻿using ICAP_Infrastructure.Entities;
 
-namespace RelationService.Entities
+namespace ICAP_RelationService.Entities
 {
     public class Friends : IEntity
     {

@@ -1,6 +1,6 @@
 ﻿using ICAP_Infrastructure.Entities;
 
-namespace ICAP_FriendService.Entities
+namespace ICAP_RelationService.Entities
 {
     public class FriendRequest : IEntity
     {

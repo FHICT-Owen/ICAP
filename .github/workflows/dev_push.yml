@@ -19,6 +19,7 @@ jobs:
       accountservice: ${{ steps.filter.outputs.accountservice }}
       friendservice: ${{ steps.filter.outputs.friendservice }}
       marketservice: ${{ steps.filter.outputs.marketservice }}
+      relationservice: ${{ steps.filter.outputs.relationservice }}
       servicebus: ${{ steps.filter.outputs.servicebus }}
     steps:
     - uses: actions/checkout@v2
@@ -34,6 +35,8 @@ jobs:
             - 'srcs/ICAP_Client/**'
           marketservice:
             - 'srcs/ICAP_MarketService/**'
+          relationservice:
+            - 'srcs/ICAP_RelationService/**'
           servicebus:
             - 'srcs/ICAP_ServiceBus/**'
   build-and-test:
