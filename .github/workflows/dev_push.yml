@@ -14,6 +14,9 @@ on:
 jobs:
   filter:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [client, accountservice, friendservice, marketservice, servicebus]
     outputs:
       client: ${{ steps.filter.outputs.client }}
       accountservice: ${{ steps.filter.outputs.accountservice }}
@@ -39,10 +42,7 @@ jobs:
   build-and-test:
     needs: filter
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service: [client, accountservice, friendservice, marketservice, servicebus]
-    if: ${{ needs.filter.outputs[build-and-test.matrix.service] == 'true' }}
+    if: ${{ needs.filter.outputs[matrix.service] == 'true' }}
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
