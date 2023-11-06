@@ -8,6 +8,7 @@ on:
     branches: "production"
     paths:
       - "srcs/**"
+      - ".github/workflows/**"
   workflow_dispatch:
 
 jobs:
@@ -47,8 +48,8 @@ jobs:
           - friendservice
           - marketservice
           - servicebus
-    if: ${{ needs.filter.outputs[build-and-test.matrix.service] == 'true' }}
     steps:
+    if: ${{ needs.filter.outputs[matrix.service] == 'true' }}
     - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
