@@ -53,7 +53,7 @@ jobs:
       if: ${{ needs.filter.outputs[matrix.services] == 'true' }}
       run: |
         cd ./srcs/${{ matrix.services }}
-        dotnet build --no-restore $(ls *.csproj)
+        dotnet build $(ls *.csproj)
 
     - name: Unit Tests
       if: ${{ needs.filter.outputs[matrix.services] == 'true' }}
