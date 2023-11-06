@@ -36,6 +36,25 @@ jobs:
             - 'srcs/ICAP_RelationService/**'
           ICAP_ServiceBus:
             - 'srcs/ICAP_ServiceBus/**'
+
+  sonarcloud-analysis:
+    needs: filter
+    runs-on: ubuntu-latest
+    steps:
+      - name: SonarCloud Scan
+        if: needs.filter.outputs[matrix.services] == 'true'
+        uses: highbyte/sonarscan-dotnet@v2.2.6
+        with:
+          # The key of the SonarQube project
+          sonarProjectKey: FHICT-Owen_ICAP
+          # The name of the SonarQube project
+          sonarProjectName: ${{ matrix.services }}
+          # The name of the SonarQube organization in SonarCloud. For hosted SonarQube, skip this setting.
+          sonarOrganization: fhict-s-owen
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build-and-test:
     needs: filter
     runs-on: ubuntu-latest
@@ -60,18 +79,4 @@ jobs:
       run: |
         cd ./srcs/${{ matrix.services }}
         dotnet test --no-build $(ls *.csproj)
-
-    - name: SonarCloud Scan
-      if: needs.filter.outputs[matrix.services] == 'true'
-      uses: highbyte/sonarscan-dotnet@v2.2.6
-      with:
-        # The key of the SonarQube project
-        sonarProjectKey: FHICT-Owen_ICAP
-        # The name of the SonarQube project
-        sonarProjectName: ${{ matrix.services }}
-        # The name of the SonarQube organization in SonarCloud. For hosted SonarQube, skip this setting.
-        sonarOrganization: fhict-s-owen
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
