@@ -26,10 +26,6 @@ namespace ICAP_RelationService.Controllers
         public async Task<ActionResult<FriendRequest>> GetByIdAsync(string id)
         {
             var item = await _friendRequestsRepository.GetAsync(id);
-            if (item == null)
-            {
-                return NotFound();
-            }
             return item;
         }
 
@@ -54,7 +50,6 @@ namespace ICAP_RelationService.Controllers
         public async Task<IActionResult> AcceptAsync(string id)
         {
             var existingItem = await _friendRequestsRepository.GetAsync(id);
-            if (existingItem == null) return NotFound();
             existingItem.Accepted = true;
             existingItem.Declined = false;
             existingItem.Pending = false;
@@ -68,13 +63,10 @@ namespace ICAP_RelationService.Controllers
         public async Task<IActionResult> DeclineAsync(string id)
         {
             var existingItem = await _friendRequestsRepository.GetAsync(id);
-            if (existingItem == null) return NotFound();
             existingItem.Accepted = false;
             existingItem.Declined = true;
             existingItem.Pending = false;
-
             await _friendRequestsRepository.UpdateAsync(existingItem);
-
             return NoContent();
         }
     }

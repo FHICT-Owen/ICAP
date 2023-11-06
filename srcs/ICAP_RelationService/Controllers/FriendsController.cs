@@ -26,10 +26,6 @@ namespace ICAP_RelationService.Controllers
         public async Task<ActionResult<Friends>> GetByIdAsync(string id)
         {
             var item = await _friendsRepository.GetAsync(id);
-            if (item == null)
-            {
-                return NotFound();
-            }
             return item;
         }
 
@@ -49,9 +45,7 @@ namespace ICAP_RelationService.Controllers
         public async Task<IActionResult> RemoveFriendAsync(string id)
         {
             var existingItem = await _friendsRepository.GetAsync(id);
-
             await _friendsRepository.UpdateAsync(existingItem);
-
             return NoContent();
         }
     }

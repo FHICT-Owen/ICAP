@@ -21,8 +21,4 @@
     <ProjectReference Include="..\ICAP_ServiceBus\ICAP_ServiceBus.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repositories\" />
-  </ItemGroup>
-
 </Project>

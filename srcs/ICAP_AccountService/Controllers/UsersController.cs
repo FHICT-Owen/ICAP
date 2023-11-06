@@ -1,5 +1,5 @@
 ﻿using ICAP_AccountService.Entities;
-using ICAP_AccountService.Repositories;
+using ICAP_Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ICAP_AccountService.Controllers
@@ -8,7 +8,12 @@ namespace ICAP_AccountService.Controllers
     [Route("users")]
     public class UsersController : ControllerBase
     {
-        private readonly MongoRepository _usersRepository = new();
+        private readonly IRepository<User> _usersRepository;
+
+        public UsersController(IRepository<User> usersRepository)
+        {
+            _usersRepository = usersRepository;
+        }
 
         [HttpGet]
         public async Task<IEnumerable<User>> GetAsync()
@@ -21,10 +26,6 @@ namespace ICAP_AccountService.Controllers
         public async Task<ActionResult<User>> GetByIdAsync(string id)
         {
             var item = await _usersRepository.GetAsync(id);
-            if (item == null)
-            {
-                return NotFound();
-            }
             return item;
         }
 
@@ -35,7 +36,6 @@ namespace ICAP_AccountService.Controllers
             {
                 Name = data.Name,
                 Email = data.Email,
-                FriendIds = new List<string>(),
                 CreatedDateTime = DateTimeOffset.Now
             };
 
@@ -50,7 +50,6 @@ namespace ICAP_AccountService.Controllers
             if (existingItem == null) return NotFound();
             existingItem.Name = data.Name;
             existingItem.Email = data.Email;
-            existingItem.FriendIds = data.FriendIds;
             
             await _usersRepository.UpdateAsync(existingItem);
 
@@ -61,9 +60,7 @@ namespace ICAP_AccountService.Controllers
         public async Task<IActionResult> DeleteAsync(string id)
         {
             var existingItem = await _usersRepository.GetAsync(id);
-            if (existingItem == null) return NotFound();
             await _usersRepository.RemoveAsync(existingItem.Id);
-
             return NoContent();
         }
     }
