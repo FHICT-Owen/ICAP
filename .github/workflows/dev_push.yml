@@ -44,9 +44,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [client, accountservice, friendservice, marketservice, servicebus]
-    if: ${{ needs.filter.outputs[needs.build-and-test.matrix['service']] == 'true' }}
+        services: [client, accountservice, friendservice, marketservice, servicebus]
     steps:
+    if: ${{ needs.filter.outputs[matrix['services']] == 'true' }}
+    steps:
+
     - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
@@ -54,12 +56,12 @@ jobs:
         dotnet-version: '7.0.x'
     - name: Build
       run: |
-        cd ./srcs/${{ matrix.service }}
+        cd ./srcs/${{ matrix.services }}
         dotnet build --no-restore $(ls *.csproj)
 
     - name: Unit Tests
       run: |
-        cd ./srcs/${{ matrix.service }}
+        cd ./srcs/${{ matrix.services }}
         dotnet test --no-build $(ls *.csproj)
 
     - name: SonarCloud Scan
@@ -68,4 +70,4 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        projectBaseDir: "./srcs/${{ matrix.service }}"
+        projectBaseDir: "./srcs/${{ matrix.services }}"
