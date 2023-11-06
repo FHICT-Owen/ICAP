@@ -54,7 +54,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          working-directory: ./srcs/
+        working-directory: ./srcs
+          
 
   build-and-test:
     needs: filter
