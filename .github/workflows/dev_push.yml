@@ -48,7 +48,7 @@ jobs:
           # The key of the SonarQube project
           sonarProjectKey: FHICT-Owen_ICAP
           # The name of the SonarQube project
-          sonarProjectName: ${{ matrix.services }}
+          sonarProjectName: ICAP
           # The name of the SonarQube organization in SonarCloud. For hosted SonarQube, skip this setting.
           sonarOrganization: fhict-s-owen
         env:
