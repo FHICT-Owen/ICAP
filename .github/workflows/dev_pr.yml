@@ -9,6 +9,7 @@ on:
     paths:
       - "srcs/**"
       - ".github/workflows/**"
+      
   workflow_dispatch:
 
 jobs:
