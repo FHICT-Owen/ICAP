@@ -45,7 +45,7 @@ jobs:
     strategy:
       matrix:
         service: [client, accountservice, friendservice, marketservice, servicebus]
-    if: ${{ needs.filter.outputs[matrix.service] == 'true' }}
+    if: ${{ needs.filter.outputs[matrix['service']] == 'true' }}
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
