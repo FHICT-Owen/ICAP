@@ -8,6 +8,7 @@ on:
     branches: "development"
     paths:
       - "srcs/**"
+      - ".github/workflows/**"
   workflow_dispatch:
   
 jobs:
