@@ -51,10 +51,10 @@ jobs:
           sonarProjectName: ICAP
           # The name of the SonarQube organization in SonarCloud. For hosted SonarQube, skip this setting.
           sonarOrganization: fhict-s-owen
+          dotnetBuildArguments: ./srcs
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        working-directory: ./srcs
           
 
   build-and-test:
