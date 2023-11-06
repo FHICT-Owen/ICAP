@@ -28,13 +28,13 @@ jobs:
         filters: |
           ICAP_Client:
             - 'srcs/ICAP_Client/**'
-          accountservice:
+          ICAP_AccountService:
             - 'srcs/ICAP_AccountService/**'
-          marketservice:
+          ICAP_MarketService:
             - 'srcs/ICAP_MarketService/**'
           ICAP_RelationService:
             - 'srcs/ICAP_RelationService/**'
-          servicebus:
+          ICAP_ServiceBus:
             - 'srcs/ICAP_ServiceBus/**'
   build-and-test:
     needs: filter
