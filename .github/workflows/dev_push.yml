@@ -36,7 +36,7 @@ jobs:
             - 'srcs/ICAP_RelationService/**'
           ICAP_ServiceBus:
             - 'srcs/ICAP_ServiceBus/**'
-        #base: 'development'      
+        base: 'development'      
 
   build-and-test:
     needs: filter
@@ -73,7 +73,7 @@ jobs:
         sonarProjectName: ICAP
         # The name of the SonarQube organization in SonarCloud. For hosted SonarQube, skip this setting.
         sonarOrganization: fhict-s-owen
-        dotnetBuildArguments: ./srcs/${{ matrix.services }}/$(ls *.csproj)
+        dotnetBuildArguments: ./srcs/${{ matrix.services }}
         dotnetDisableTests: true
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
