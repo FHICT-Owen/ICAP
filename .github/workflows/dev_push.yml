@@ -40,7 +40,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [client, accountservice, friendservice, marketservice, servicebus] # Add more services as needed
+        service:
+          - client
+          - accountservice
+          - friendservice
+          - marketservice
+          - servicebus
     if: ${{ needs.filter.outputs[matrix.service] == 'true' }}
     steps:
     - uses: actions/checkout@v2
