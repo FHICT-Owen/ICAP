@@ -69,3 +69,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         projectBaseDir: "./srcs/${{ matrix.services }}"
+        args: >
+          - Dsonar.organization=fhict-s-owen
+          - Dsonar.projectKey=FHICT-Owen_ICAP
+          - Dsonar.test.exclusions=tests/**
+          - Dsonar.tests=tests/
