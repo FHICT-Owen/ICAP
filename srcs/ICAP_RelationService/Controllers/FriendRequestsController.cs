@@ -1,14 +1,19 @@
-﻿using ICAP_FriendService.Entities;
-using ICAP_FriendService.Repositories;
+﻿using ICAP_Infrastructure.Repositories;
+using ICAP_RelationService.Entities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ICAP_FriendService.Controllers
+namespace ICAP_RelationService.Controllers
 {
     [ApiController]
     [Route("friendrequests")]
     public class FriendRequestsController : ControllerBase
     {
-        private readonly FriendRequestsRepository _friendRequestsRepository = new();
+        private readonly IRepository<FriendRequest> _friendRequestsRepository;
+
+        public FriendRequestsController(IRepository<FriendRequest> friendRequestsRepository)
+        {
+            _friendRequestsRepository = friendRequestsRepository;
+        }
 
         [HttpGet]
         public async Task<IEnumerable<FriendRequest>> GetAsync()
@@ -18,7 +23,7 @@ namespace ICAP_FriendService.Controllers
         }
 
         [HttpPost("{id}")]
-        public async Task<ActionResult<FriendRequest>> GetByIdAsync(Guid id)
+        public async Task<ActionResult<FriendRequest>> GetByIdAsync(string id)
         {
             var item = await _friendRequestsRepository.GetAsync(id);
             if (item == null)
@@ -46,7 +51,7 @@ namespace ICAP_FriendService.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> AcceptAsync(Guid id)
+        public async Task<IActionResult> AcceptAsync(string id)
         {
             var existingItem = await _friendRequestsRepository.GetAsync(id);
             if (existingItem == null) return NotFound();
@@ -60,7 +65,7 @@ namespace ICAP_FriendService.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> DeclineAsync(Guid id)
+        public async Task<IActionResult> DeclineAsync(string id)
         {
             var existingItem = await _friendRequestsRepository.GetAsync(id);
             if (existingItem == null) return NotFound();

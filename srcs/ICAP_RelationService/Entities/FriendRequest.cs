@@ -1,10 +1,10 @@
-﻿using ICAP_AccountService.Entities;
+﻿using ICAP_Infrastructure.Entities;
 
 namespace ICAP_FriendService.Entities
 {
     public class FriendRequest : IEntity
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string UserFrom { get; set; }
         public string UserTo { get; set; }
         public bool Declined { get; set; }

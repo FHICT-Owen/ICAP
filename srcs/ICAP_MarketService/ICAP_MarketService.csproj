@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ICAP_Infrastructure\ICAP_Infrastructure.csproj" />
     <ProjectReference Include="..\ICAP_ServiceBus\ICAP_ServiceBus.csproj" />
   </ItemGroup>
 

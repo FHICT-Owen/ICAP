@@ -1,9 +1,10 @@
-﻿using ICAP_AccountService.Entities;
+﻿using System.Linq.Expressions;
+using ICAP_Infrastructure.Entities;
 using MongoDB.Driver;
 
-namespace ICAP_AccountService.Repositories
+namespace ICAP_Infrastructure.Repositories
 {
-    public class MongoRepository<T> : IRepository<T> where T : IEntity, IStringEntity
+    public class MongoRepository<T> : IRepository<T> where T : IEntity
     {
         private readonly IMongoCollection<T> _dbCollection;
         private readonly FilterDefinitionBuilder<T> _filterBuilder = Builders<T>.Filter;
@@ -18,21 +19,26 @@ namespace ICAP_AccountService.Repositories
             return await _dbCollection.Find(_filterBuilder.Empty).ToListAsync();
         }
 
-        public async Task<T> GetAsync(Guid id)
+        public async Task<IReadOnlyCollection<T>> GetAllAsync(Expression<Func<T, bool>> filter)
+        {
+            return await _dbCollection.Find(filter).ToListAsync();
+        }
+
+        public async Task<T> GetAsync(string id)
         {
             var filter = _filterBuilder.Eq(entity => entity.Id, id);
             return await _dbCollection.Find(filter).FirstOrDefaultAsync();
         }
 
-        public async Task<T> GetAsync(string id)
+        public async Task<T> GetAsync(Expression<Func<T, bool>> filter)
         {
-            var filter = _filterBuilder.Eq(entity => entity.StringId, id);
             return await _dbCollection.Find(filter).FirstOrDefaultAsync();
         }
 
         public async Task CreateAsync(T entity)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
+            if (entity.Id == "") entity.Id = Guid.NewGuid().ToString();
             await _dbCollection.InsertOneAsync(entity);
         }
 
@@ -43,15 +49,9 @@ namespace ICAP_AccountService.Repositories
             await _dbCollection.ReplaceOneAsync(filter, entity);
         }
 
-        public async Task RemoveAsync(Guid id)
-        {
-            var filter = _filterBuilder.Eq(entity => entity.Id, id);
-            await _dbCollection.DeleteOneAsync(filter);
-        }
-
         public async Task RemoveAsync(string id)
         {
-            var filter = _filterBuilder.Eq(entity => entity.StringId, id);
+            var filter = _filterBuilder.Eq(entity => entity.Id, id);
             await _dbCollection.DeleteOneAsync(filter);
         }
     }

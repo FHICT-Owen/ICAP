@@ -1,11 +1,11 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:57684",
-      "sslPort": 44380
+      "applicationUrl": "http://localhost:56281",
+      "sslPort": 44387
     }
   },
   "profiles": {
@@ -14,9 +14,11 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5034",
+      "applicationUrl": "http://localhost:5075",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://icapvault.vault.azure.net/",
+        "AZURE_USERNAME": "461496@student.fontys.nl"
       }
     },
     "https": {
@@ -24,9 +26,11 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7001;http://localhost:5034",
+      "applicationUrl": "https://localhost:7097;http://localhost:5075",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://icapvault.vault.azure.net/",
+        "AZURE_USERNAME": "461496@student.fontys.nl"
       }
     },
     "IIS Express": {
@@ -34,7 +38,9 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://icapvault.vault.azure.net/",
+        "AZURE_USERNAME": "461496@student.fontys.nl"
       }
     }
   }
