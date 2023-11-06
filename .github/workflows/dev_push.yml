@@ -42,7 +42,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: SonarCloud Scan
-        if: needs.filter.outputs[matrix.services] == 'true'
         uses: highbyte/sonarscan-dotnet@v2.2.6
         with:
           # The key of the SonarQube project
