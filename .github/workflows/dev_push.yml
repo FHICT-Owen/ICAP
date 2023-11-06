@@ -63,14 +63,15 @@ jobs:
 
     - name: SonarCloud Scan
       if: needs.filter.outputs[matrix.services] == 'true'
-      uses: SonarSource/sonarcloud-github-action@master
+      uses: highbyte/sonarscan-dotnet@v2.2.6
+      with:
+        # The key of the SonarQube project
+        sonarProjectKey: FHICT-Owen_ICAP
+        # The name of the SonarQube project
+        sonarProjectName: ${{ matrix.services }}
+        # The name of the SonarQube organization in SonarCloud. For hosted SonarQube, skip this setting.
+        sonarOrganization: fhict-s-owen
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        projectBaseDir: "./srcs/${{ matrix.services }}"
-        args: >
-          - Dsonar.organization=fhict-s-owen
-          - Dsonar.projectKey=FHICT-Owen_ICAP
-          - Dsonar.test.exclusions=tests/**
-          - Dsonar.tests=tests/
+      
