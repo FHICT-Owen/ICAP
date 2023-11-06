@@ -45,7 +45,7 @@ jobs:
     strategy:
       matrix:
         services: [client, accountservice, friendservice, marketservice, servicebus]
-    #if: ${{ needs.filter.outputs[matrix['services']] == 'true' }}
+    if: ${{ needs.filter.outputs[matrix['services']] == 'true' }}
     steps:
     - name: Echo outputs
       run: |
