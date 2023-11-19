@@ -10,9 +10,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_AccountService", "ICAP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_ServiceBus", "ICAP_ServiceBus\ICAP_ServiceBus.csproj", "{4EF3E689-0DD3-412C-8C80-7433A9469F43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_Infrastructure", "ICAP_Infrastructure\ICAP_Infrastructure.csproj", "{AE00BB6E-44B9-492C-8808-12B0D90D3113}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_Infrastructure", "ICAP_Infrastructure\ICAP_Infrastructure.csproj", "{AE00BB6E-44B9-492C-8808-12B0D90D3113}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_RelationService", "ICAP_RelationService\ICAP_RelationService.csproj", "{D9C49325-57F6-4235-B2B1-38E55178EAB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_RelationService", "ICAP_RelationService\ICAP_RelationService.csproj", "{D9C49325-57F6-4235-B2B1-38E55178EAB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_AccountService.Specs", "ICAP_AccountService.Specs\ICAP_AccountService.Specs.csproj", "{0307F58C-0276-45E0-A3F9-3EA16B898EED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_Client.Specs", "ICAP_Client.Specs\ICAP_Client.Specs.csproj", "{2AF2B337-85C4-4794-888F-E4484DF4B8B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{F3215FD0-2647-4B53-B561-AC5D632B404D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_MarketService.Specs", "ICAP_MarketService.Specs\ICAP_MarketService.Specs.csproj", "{B47BDC92-373C-4D06-858F-DDAE5A0E6953}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_RelationService.Specs", "ICAP_RelationService.Specs\ICAP_RelationService.Specs.csproj", "{13AC375D-84A4-4EDF-805F-BE86F7148272}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,9 +54,31 @@ Global
 		{D9C49325-57F6-4235-B2B1-38E55178EAB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9C49325-57F6-4235-B2B1-38E55178EAB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9C49325-57F6-4235-B2B1-38E55178EAB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0307F58C-0276-45E0-A3F9-3EA16B898EED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0307F58C-0276-45E0-A3F9-3EA16B898EED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0307F58C-0276-45E0-A3F9-3EA16B898EED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0307F58C-0276-45E0-A3F9-3EA16B898EED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AF2B337-85C4-4794-888F-E4484DF4B8B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AF2B337-85C4-4794-888F-E4484DF4B8B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AF2B337-85C4-4794-888F-E4484DF4B8B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AF2B337-85C4-4794-888F-E4484DF4B8B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B47BDC92-373C-4D06-858F-DDAE5A0E6953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B47BDC92-373C-4D06-858F-DDAE5A0E6953}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B47BDC92-373C-4D06-858F-DDAE5A0E6953}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B47BDC92-373C-4D06-858F-DDAE5A0E6953}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13AC375D-84A4-4EDF-805F-BE86F7148272}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13AC375D-84A4-4EDF-805F-BE86F7148272}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13AC375D-84A4-4EDF-805F-BE86F7148272}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13AC375D-84A4-4EDF-805F-BE86F7148272}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0307F58C-0276-45E0-A3F9-3EA16B898EED} = {F3215FD0-2647-4B53-B561-AC5D632B404D}
+		{2AF2B337-85C4-4794-888F-E4484DF4B8B7} = {F3215FD0-2647-4B53-B561-AC5D632B404D}
+		{B47BDC92-373C-4D06-858F-DDAE5A0E6953} = {F3215FD0-2647-4B53-B561-AC5D632B404D}
+		{13AC375D-84A4-4EDF-805F-BE86F7148272} = {F3215FD0-2647-4B53-B561-AC5D632B404D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {166ED825-FBF3-403E-8FB3-C16E60DDFD78}
