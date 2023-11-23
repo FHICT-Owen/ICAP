@@ -59,9 +59,87 @@ Below are some examplary misuse cases where a bad actor tries to gain access to 
 
 ## Analysis Based On CIAP
 CIAP is a metric used to classify data into a scale that is easy to understand. It consists of the following classifications:
-- **Availability**: not needed (0), important (1), required (2), essential (3)
-- **Integrity**: unprotected (0), protected (1), high (2), absolute (3)
 - **Confidentiality**: public (0), company confidential (1), confidential (2), classified (3)
+- **Integrity**: unprotected (0), protected (1), high (2), absolute (3)
+- **Availability**: not needed (0), important (1), required (2), essential (3)
 - **Privacy**: public (0), PII (p)
 
-### Cases To Analyze with CIAP
+As ICAP has 3 different focusses combined into one platform, forums, messaging and a market system. A few data types that will have to exist within the application in order to make it a functioning application will be: Messages, Personal information, Market listings and Forum posts. Below these 4 data types will be classified using CIAP.
+
+### Messages
+In the context of ICAP's functionality, messages are between 2 or multiple individuals and are send using ICAP's instant messaging feature. The following classification can be given based on this information.
+- **Confidentiality**: 1
+- **Integrity**: 1
+- **Availability**: 2
+- **Privacy**: PII
+
+### Personal information
+When it comes to personal information, like address information, this data is subject to privacy laws and therefore should be kept confidential.
+- **Confidentiality**: 2
+- **Integrity**: 1
+- **Availability**: 0
+- **Privacy**: PII
+
+### Market listings
+Market listings are public listings that are viewable for anyone on the platform. They should only be editable by the technician that made the listing and nobody else. Listings should also be possible for guests to view.
+- **Confidentiality**: 0
+- **Integrity**: 1
+- **Availability**: 2
+- **Privacy**: 0
+
+### Forum posts
+A forum posts is pretty self-explanatory. Like the listing, they should only be editable by the original poster and be removable if deemed inappropriate by a moderator. These posts should also be viewable by anyone using the platform.
+- **Confidentiality**: 0
+- **Integrity**: 1
+- **Availability**: 2
+- **Privacy**: 0
+
+## Misuse Cases
+The following abuse cases were formulated based on some of the user stories within ICAP. 
+
+### 1. Known Vulnerabilities
+- *As an attacker, I find common open source or closed source packages with weaknesses and perform attacks against vulnerabilities and exploits which are disclosed.*
+
+### 2. Broken Access Control
+- *As an attacker, I bypass access control checks by modifying the URL, internal application state, or the HTML page, or simply using a custom API attack tool.*
+- *As an attacker, I manipulate the primary key and change it to access another's users record, allowing viewing or editing someone else's account.*
+- *As an attacker, I manipulate sessions, access tokens, or other access controls in the application to act as a user without being logged in, or acting as an admin/privileged user when logged in as a user.*
+- *As an attacker, I force browsing to authenticated pages as an unauthenticated user or to privileged pages as a standard user.*
+- *As an attacker, I access APIs with missing access controls for POST, PUT and DELETE.*
+
+### 3. Messages
+- *As an attacker, I eavesdrop on messages sent over unsecured or poorly encrypted connections.*
+- *As an attacker, I spoof messages to appear as if they come from the messaging system itself.*
+- *As an attacker, I flood the messaging system with a high volume of automated messages.*
+- *As an attacker, I send messages with malicious attachments or links to unsuspecting users.*
+
+### 4. Security Misconfiguration
+- *As an attacker, I probe and exploit misconfigured firewall rules to access restricted network areas.*
+- *As an attacker, I take advantage of debugging interfaces or verbose error messages left enabled in production.*
+- *As an attacker, I intercept data transmitted over unencrypted connections due to lack of SSL/TLS implementation.*
+- *As an attacker, I exploit incomplete or poorly configured authentication flows to gain unauthorized access.*
+- *As an attacker, I exploit misconfigured keystores to access secrets that could give me elevated system access.*
+
+## Mitigations
+In the following section mitigations, for making sure the misuse cases from the previous section can not be applied, are shown.
+
+### Authentication Service
+The application should have a service or already well-established mechanism of authorizing users and requests to make sure that bad actors do not gain access to parts of the system that they should not have access to. This includes a way to secure all services by checking if requests that come in have the proper authority to access the endpoint in question. 
+
+### Message Bus
+Using Azure Service bus as the main messaging bus means that requests are always encrypted using TLS. This makes sure that any messages that get intercepted are still unreadable.
+
+### Azure Key Vault
+The use of Azure Key Vault makes sure that any secrets for the front- and back-end are stored securely and not easily accessible to end-users. 
+
+### Principle of Least Privilege
+Apply the principle of least privilege to microservice access controls. This minimizes each service's access to only what is necessary, reducing the potential impact of a compromised service.
+
+### Use of WSS
+Make sure that when websockets are established for messaging, the WSS protocol is used so all messages are secured.
+
+### Separate configs for production and staging
+This is to make sure that no debug related logging features make it into production code that can then be used to gain more information about the system. 
+
+### Secure gateway
+An API Gateway acts as a control point to enforce access control, reducing the complexity within individual microservices and providing a unified authentication/authorization layer. This gateway can then also make it so there is only a single ingress point for the entire system.
