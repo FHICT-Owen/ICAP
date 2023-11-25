@@ -123,7 +123,7 @@ The following abuse cases were formulated based on some of the user stories with
 ## Mitigations
 In the following section mitigations, for making sure the misuse cases from the previous section can not be applied, are shown.
 
-### Authentication Service
+### Authentication & Authorization
 The application should have a service or already well-established mechanism of authorizing users and requests to make sure that bad actors do not gain access to parts of the system that they should not have access to. This includes a way to secure all services by checking if requests that come in have the proper authority to access the endpoint in question. 
 
 ### Message Bus
@@ -141,5 +141,5 @@ Make sure that when websockets are established for messaging, the WSS protocol i
 ### Separate configs for production and staging
 This is to make sure that no debug related logging features make it into production code that can then be used to gain more information about the system. 
 
-### Secure gateway
+### Secure API gateway
 An API Gateway acts as a control point to enforce access control, reducing the complexity within individual microservices and providing a unified authentication/authorization layer. This gateway can then also make it so there is only a single ingress point for the entire system.
