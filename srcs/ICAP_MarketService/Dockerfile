@@ -1,18 +1,21 @@
-FROM icap-dotnet-sdk-base:1.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS builder
 WORKDIR /app
 
-# Copy necessary files and restore as distinct layer
-COPY *.csproj ./
+# caches restore result by copying csproj file separately
+COPY *.csproj .
 RUN dotnet restore
 
-# Copy everything else and build
-COPY . ./
-RUN dotnet publish -c Release -o out
+COPY . .
+RUN dotnet publish --output /app/ --configuration Release --no-restore
+RUN sed -n 's:.*<AssemblyName>\(.*\)</AssemblyName>.*:\1:p' *.csproj > __assemblyname
+RUN if [ ! -s __assemblyname ]; then filename=$(ls *.csproj); echo ${filename%.*} > __assemblyname; fi
 
-# Build runtime image
-FROM icap-dotnet-runtime-base:1.0
+# Stage 2
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build-env /app/out .
+COPY --from=builder /app .
 
-# Start
-ENTRYPOINT ["dotnet", "ICAP_MarketService.dll"]
+ENV PORT 5001
+EXPOSE 5001
+
+ENTRYPOINT dotnet $(cat /app/__assemblyname).dll --urls "http://*:5001"

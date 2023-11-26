@@ -15,7 +15,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=builder /app .
 
-ENV PORT 5000
-EXPOSE 5000
+ENV PORT 5002
+EXPOSE 5002
 
-ENTRYPOINT dotnet $(cat /app/__assemblyname).dll --urls "http://*:5000"
+ENTRYPOINT dotnet $(cat /app/__assemblyname).dll --urls "http://*:5002"

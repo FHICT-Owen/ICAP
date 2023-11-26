@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ICAP_MarketService
+  labels:
+    app: ICAP_MarketService
+  namespace: ICAP
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ICAP_MarketService
+  template:
+    metadata:
+      labels:
+        app: ICAP_MarketService
+    spec:
+      containers:
+        - name: ICAP_MarketService
+          image: ICAP_MarketService:latest
+          ports:
+            - containerPort: 80

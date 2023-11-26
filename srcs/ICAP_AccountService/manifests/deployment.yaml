@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ICAP_AccountService
+  labels:
+    app: ICAP_AccountService
+  namespace: ICAP
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ICAP_AccountService
+  template:
+    metadata:
+      labels:
+        app: ICAP_AccountService
+    spec:
+      containers:
+        - name: ICAP_AccountService
+          image: ICAP_AccountService:latest
+          ports:
+            - containerPort: 5000
