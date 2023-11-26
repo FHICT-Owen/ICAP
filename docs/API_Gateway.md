@@ -15,6 +15,6 @@ As mentioned in the definition, there are several different technologies that ar
 After doing some research online, there are mainly 3 possible places where you can put your API gateway, as illustrated by the image below. The placement of the gateway also does not have to be limited to just a single place. It can be a combination of places.
 ![Illustration for gateway placements](./Media/NGINX.png)
 
-In the case of ICAP it makes sense to place the gateway at the edge of the cluster as there will only be a single Kubernetes cluster within ICAP. The technology choice for the API gateway will be to make use of a Kubernetes natively availabel ingress controller that can both route requests, but also authorize those requests. 
+In the case of ICAP it makes sense to place the gateway at the edge of the cluster as there will only be a single Kubernetes cluster within ICAP. The technology choice for the API gateway will be to make use of a Kubernetes natively available ingress controller or Kubernetes gateway API implementation that can both route requests, but also authorize those requests. 
 
 In order to achieve a secure request format, ICAP will make use of JSON Web Tokens (JWTs for short or "JOTs" in spoken language). These JWTs will be validated by the ingress controller and then the request will be processed by the appropriate service. At the service level the token can then be used to allow the request to be processed or not by checking the token against the one given by the identity provider. 
