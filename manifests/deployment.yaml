@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: production
+  labels:
+    app: production
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: production
+  template:
+    metadata:
+      labels:
+        app: production
+    spec:
+      containers:
+        - name: production
+          image: icapregistry.azurecr.io/image-workflow-1701124494229:latest
+          ports:
+            - containerPort: 5000
