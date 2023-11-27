@@ -1,21 +1,27 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS builder
+#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER app
 WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
 
-# caches restore result by copying csproj file separately
-COPY *.csproj .
-RUN dotnet restore
-
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["ICAP_RelationService/ICAP_RelationService.csproj", "ICAP_RelationService/"]
+COPY ["ICAP_Infrastructure/ICAP_Infrastructure.csproj", "ICAP_Infrastructure/"]
+COPY ["ICAP_ServiceBus/ICAP_ServiceBus.csproj", "ICAP_ServiceBus/"]
+RUN dotnet restore "./ICAP_RelationService/./ICAP_RelationService.csproj"
 COPY . .
-RUN dotnet publish --output /app/ --configuration Release --no-restore
-RUN sed -n 's:.*<AssemblyName>\(.*\)</AssemblyName>.*:\1:p' *.csproj > __assemblyname
-RUN if [ ! -s __assemblyname ]; then filename=$(ls *.csproj); echo ${filename%.*} > __assemblyname; fi
+WORKDIR "/src/ICAP_RelationService"
+RUN dotnet build "./ICAP_RelationService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Stage 2
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./ICAP_RelationService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
 WORKDIR /app
-COPY --from=builder /app .
-
-ENV PORT 5002
-EXPOSE 5002
-
-ENTRYPOINT dotnet $(cat /app/__assemblyname).dll --urls "http://*:5002"
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "ICAP_RelationService.dll"]
