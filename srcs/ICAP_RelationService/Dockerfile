@@ -8,13 +8,13 @@ EXPOSE 5102
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /srcs
-COPY ["ICAP_RelationService/ICAP_RelationService.csproj", "ICAP_RelationService/"]
-COPY ["ICAP_Infrastructure/ICAP_Infrastructure.csproj", "ICAP_Infrastructure/"]
-COPY ["ICAP_ServiceBus/ICAP_ServiceBus.csproj", "ICAP_ServiceBus/"]
+WORKDIR /src
+COPY ["../ICAP_RelationService/ICAP_RelationService.csproj", "ICAP_RelationService/"]
+COPY ["../ICAP_Infrastructure/ICAP_Infrastructure.csproj", "ICAP_Infrastructure/"]
+COPY ["../ICAP_ServiceBus/ICAP_ServiceBus.csproj", "ICAP_ServiceBus/"]
 RUN dotnet restore "./ICAP_RelationService/./ICAP_RelationService.csproj"
 COPY . .
-WORKDIR "/srcs/ICAP_RelationService"
+WORKDIR "/src/ICAP_RelationService"
 RUN dotnet build "./ICAP_RelationService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
