@@ -9,59 +9,135 @@ on:
     paths:
       - "srcs/**"
   workflow_dispatch:
+env:
+    ACR_RESOURCE_GROUP: ICAP
+    AZURE_CONTAINER_REGISTRY: ICAPregistry
+    CLUSTER_NAME: ICAP_AKS
+    CLUSTER_RESOURCE_GROUP: ICAP
 
 jobs:
   filter:
     runs-on: ubuntu-latest
     outputs:
-      client: ${{ steps.filter.outputs.client }}
-      accountservice: ${{ steps.filter.outputs.accountservice }}
-      friendservice: ${{ steps.filter.outputs.friendservice }}
-      marketservice: ${{ steps.filter.outputs.marketservice }}
-      servicebus: ${{ steps.filter.outputs.servicebus }}
+      ICAP_Client: ${{ steps.filter.outputs.ICAP_Client }}
+      ICAP_AccountService: ${{ steps.filter.outputs.ICAP_AccountService }}
+      ICAP_MarketService: ${{ steps.filter.outputs.ICAP_MarketService }}
+      ICAP_RelationService: ${{ steps.filter.outputs.ICAP_RelationService }}
+      ICAP_ServiceBus: ${{ steps.filter.outputs.ICAP_ServiceBus }}
     steps:
     - uses: actions/checkout@v2
     - uses: dorny/paths-filter@v2
       id: filter
       with:
         filters: |
-          client:
+          ICAP_Client:
             - 'srcs/ICAP_Client/**'
-          accountservice:
+          ICAP_AccountService:
             - 'srcs/ICAP_AccountService/**'
-          friendservice:
-            - 'srcs/ICAP_Client/**'
-          marketservice:
+          ICAP_MarketService:
             - 'srcs/ICAP_MarketService/**'
-          servicebus:
+          ICAP_RelationService:
+            - 'srcs/ICAP_RelationService/**'
+          ICAP_ServiceBus:
             - 'srcs/ICAP_ServiceBus/**'
+        base: 'development'      
+
   build-and-test:
     needs: filter
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [client, accountservice, friendservice, marketservice, servicebus] # Add more services as needed
-    if: ${{ needs.filter.outputs[matrix.service] == 'true' }}
+        services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService, ICAP_ServiceBus]
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
+      if: needs.filter.outputs[matrix.services] == 'true'
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '7.0.x'
+        dotnet-version: '8.0.x'
     - name: Build
+      if: needs.filter.outputs[matrix.services] == 'true'
       run: |
-        cd ./srcs/${{ matrix.service }}
-        dotnet build --no-restore $(ls *.csproj)
+        cd ./srcs/${{ matrix.services }}
+        dotnet build $(ls *.csproj)
 
     - name: Unit Tests
+      if: needs.filter.outputs[matrix.services] == 'true'
       run: |
-        cd ./srcs/${{ matrix.service }}
+        cd ./srcs/${{ matrix.services }}
         dotnet test --no-build $(ls *.csproj)
 
     - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
+      if: needs.filter.outputs[matrix.services] == 'true'
+      uses: highbyte/sonarscan-dotnet@v2.3.0
+      with:
+        # The key of the SonarQube project
+        sonarProjectKey: FHICT-Owen_ICAP
+        # The name of the SonarQube project
+        sonarProjectName: ICAP
+        # The name of the SonarQube organization in SonarCloud. For hosted SonarQube, skip this setting.
+        sonarOrganization: fhict-s-owen
+        dotnetBuildArguments: ./srcs/${{ matrix.services }}
+        dotnetDisableTests: true
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        projectBaseDir: "./srcs/${{ matrix.service }}"
+
+  build-image:
+    needs: build-and-test
+    permissions:
+        contents: read
+        id-token: write
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
+    steps:
+        - uses: actions/checkout@v3
+        - uses: azure/login@92a5484dfaf04ca78a94597f4f19fea633851fa2
+          name: Azure login
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        - name: Build and push image to ACR
+          run: az acr build --image $(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]'):${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/${{ matrix.services }}/Dockerfile ./
+
+  deploy: 
+    needs: build-image
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: azure/login@92a5484dfaf04ca78a94597f4f19fea633851fa2
+        name: Azure login
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+      - uses: azure/use-kubelogin@v1
+        name: Set up kubelogin for non-interactive login
+        with:
+          kubelogin-version: v0.0.25
+      - uses: azure/aks-set-context@v3
+        name: Get K8s context
+        with:
+          admin: "false"
+          cluster-name: ${{ env.CLUSTER_NAME }}
+          resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+          use-kubelogin: "true"
+      - uses: Azure/k8s-deploy@v4
+        name: Deploys application
+        with:
+          action: deploy
+          images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]'):${{ github.sha }}
+          manifests: |
+            ./srcs/${{ matrix.services }}/manifests/deployment.yaml
+            ./srcs/${{ matrix.services }}/manifests/service.yaml
+          namespace: default
