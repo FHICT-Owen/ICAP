@@ -50,26 +50,26 @@ jobs:
         services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService, ICAP_ServiceBus]
     steps:
     - uses: actions/checkout@v4
-      if: needs.filter.outputs[matrix.services] == 'true'
+      if: needs.filter.outputs[matrix.services]
     - name: Setup .NET Core
-      if: needs.filter.outputs[matrix.services] == 'true'
+      if: needs.filter.outputs[matrix.services]
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '8.0.x'
     - name: Build
-      if: needs.filter.outputs[matrix.services] == 'true'
+      if: needs.filter.outputs[matrix.services]
       run: |
         cd ./srcs/${{ matrix.services }}
         dotnet build $(ls *.csproj)
 
     - name: Unit Tests
-      if: needs.filter.outputs[matrix.services] == 'true'
+      if: needs.filter.outputs[matrix.services]
       run: |
         cd ./srcs/${{ matrix.services }}
         dotnet test --no-build $(ls *.csproj)
 
     - name: SonarCloud Scan
-      if: needs.filter.outputs[matrix.services] == 'true'
+      if: needs.filter.outputs[matrix.services]
       uses: highbyte/sonarscan-dotnet@v2.3.0
       with:
         # The key of the SonarQube project
@@ -85,28 +85,28 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-image:
-    needs: build-and-test
+    needs: [filter, build-and-test]
     permissions:
-        contents: read
-        id-token: write
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     strategy:
       matrix:
         services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
         - uses: actions/checkout@v4
-          if: needs.filter.outputs[matrix.services] == 'true'
+          if: needs.filter.outputs[matrix.services]
         - uses: azure/login@v1
-          if: needs.filter.outputs[matrix.services] == 'true'
+          if: needs.filter.outputs[matrix.services]
           name: Azure login
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
         - name: Build and push image to ACR
-          if: needs.filter.outputs[matrix.services] == 'true'
+          if: needs.filter.outputs[matrix.services]
           run: az acr build --image $(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]'):${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/${{ matrix.services }}/Dockerfile ./
 
   deploy: 
-    needs: build-image
+    needs: [filter, build-image]
     permissions:
       actions: read
       contents: read
@@ -116,20 +116,22 @@ jobs:
       matrix:
         services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
+      - name: See filter output
+        run: echo "The value is ${{ needs.filter.outputs[matrix.services] }}"
       - uses: actions/checkout@v4
-        if: needs.filter.outputs[matrix.services] == 'true'
+        if: needs.filter.outputs[matrix.services]
       - uses: azure/login@v1
-        if: needs.filter.outputs[matrix.services] == 'true'
+        if: needs.filter.outputs[matrix.services]
         name: Azure login
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - uses: azure/use-kubelogin@v1
-        if: needs.filter.outputs[matrix.services] == 'true'
+        if: needs.filter.outputs[matrix.services]
         name: Set up kubelogin for non-interactive login
         with:
           kubelogin-version: v0.0.25
       - uses: azure/aks-set-context@v3
-        if: needs.filter.outputs[matrix.services] == 'true'
+        if: needs.filter.outputs[matrix.services]
         name: Get K8s context
         with:
           admin: "false"
@@ -137,7 +139,7 @@ jobs:
           resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
           use-kubelogin: "true"
       - uses: Azure/k8s-deploy@v4
-        if: needs.filter.outputs[matrix.services] == 'true'
+        if: needs.filter.outputs[matrix.services]
         name: Deploys application
         with:
           action: deploy

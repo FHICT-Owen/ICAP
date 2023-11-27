@@ -86,10 +86,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-image:
-    needs: build-and-test
+    needs: [filter, build-and-test]
     permissions:
-        contents: read
-        id-token: write
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -107,7 +107,7 @@ jobs:
           run: az acr build --image $(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]'):${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/${{ matrix.services }}/Dockerfile ./
 
   deploy: 
-    needs: build-image
+    needs: [filter, build-image]
     permissions:
       actions: read
       contents: read
