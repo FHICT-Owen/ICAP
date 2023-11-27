@@ -96,13 +96,11 @@ jobs:
     steps:
         - uses: actions/checkout@v4
           if: needs.filter.outputs[matrix.services] == 'true'
-        - uses: azure/login@92a5484dfaf04ca78a94597f4f19fea633851fa2
+        - uses: azure/login@v1
           if: needs.filter.outputs[matrix.services] == 'true'
           name: Azure login
           with:
-            client-id: ${{ secrets.AZURE_CLIENT_ID }}
-            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
         - name: Build and push image to ACR
           if: needs.filter.outputs[matrix.services] == 'true'
           run: az acr build --image $(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]'):${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/${{ matrix.services }}/Dockerfile ./
@@ -120,13 +118,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         if: needs.filter.outputs[matrix.services] == 'true'
-      - uses: azure/login@92a5484dfaf04ca78a94597f4f19fea633851fa2
+      - uses: azure/login@v1
         if: needs.filter.outputs[matrix.services] == 'true'
         name: Azure login
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
       - uses: azure/use-kubelogin@v1
         if: needs.filter.outputs[matrix.services] == 'true'
         name: Set up kubelogin for non-interactive login
