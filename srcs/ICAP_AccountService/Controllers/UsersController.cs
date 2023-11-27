@@ -43,17 +43,16 @@ namespace ICAP_AccountService.Controllers
             return CreatedAtAction(nameof(GetByIdAsync), new { id = request.Id }, request);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAsync(string id, User data)
+        [HttpPut]
+        public async Task<IActionResult> PutAsync(User data)
         {
-            var existingItem = await _usersRepository.GetAsync(id);
-            if (existingItem == null) return NotFound();
+            var existingItem = await _usersRepository.GetAsync(data.Id);
             existingItem.Name = data.Name;
             existingItem.Email = data.Email;
             
             await _usersRepository.UpdateAsync(existingItem);
 
-            return NoContent();
+            return Ok();
         }
 
         [HttpDelete("{id}")]
@@ -61,7 +60,7 @@ namespace ICAP_AccountService.Controllers
         {
             var existingItem = await _usersRepository.GetAsync(id);
             await _usersRepository.RemoveAsync(existingItem.Id);
-            return NoContent();
+            return Ok();
         }
     }
 }
