@@ -8,7 +8,7 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
+WORKDIR /srcs
 COPY ["ICAP_AccountService/ICAP_AccountService.csproj", "ICAP_AccountService/"]
 COPY ["ICAP_Infrastructure/ICAP_Infrastructure.csproj", "ICAP_Infrastructure/"]
 COPY ["ICAP_ServiceBus/ICAP_ServiceBus.csproj", "ICAP_ServiceBus/"]
