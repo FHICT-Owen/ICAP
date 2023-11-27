@@ -53,7 +53,7 @@ jobs:
       if: needs.filter.outputs[matrix.services]
     - name: Setup .NET Core
       if: needs.filter.outputs[matrix.services]
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
     - name: Build
@@ -62,15 +62,15 @@ jobs:
         cd ./srcs/${{ matrix.services }}
         dotnet build $(ls *.csproj)
 
-    - name: Unit Tests
+    - name: SpecFlow Tests
       if: needs.filter.outputs[matrix.services]
       run: |
-        cd ./srcs/${{ matrix.services }}
+        cd ./srcs/${{ matrix.services }}.Specs
         dotnet test --no-build $(ls *.csproj)
 
     - name: SonarCloud Scan
       if: needs.filter.outputs[matrix.services]
-      uses: highbyte/sonarscan-dotnet@v2.3.0
+      uses: highbyte/sonarscan-dotnet@v2
       with:
         # The key of the SonarQube project
         sonarProjectKey: FHICT-Owen_ICAP
