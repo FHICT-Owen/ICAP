@@ -41,7 +41,7 @@ jobs:
             - 'srcs/ICAP_RelationService/**'
           ICAP_ServiceBus:
             - 'srcs/ICAP_ServiceBus/**'
-        base: 'development'      
+        base: 'production'      
 
   build-and-test:
     needs: filter
