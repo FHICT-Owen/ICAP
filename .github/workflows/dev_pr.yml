@@ -70,7 +70,7 @@ jobs:
 
     - name: SonarCloud Scan
       if: needs.filter.outputs[matrix.services]
-      uses: highbyte/sonarscan-dotnet@v2
+      uses: highbyte/sonarscan-dotnet@v2.3.0
       with:
         # The key of the SonarQube project
         sonarProjectKey: FHICT-Owen_ICAP
