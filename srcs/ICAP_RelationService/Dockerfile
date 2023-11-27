@@ -3,8 +3,8 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 5002
+EXPOSE 5102
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -14,7 +14,7 @@ COPY ["ICAP_Infrastructure/ICAP_Infrastructure.csproj", "ICAP_Infrastructure/"]
 COPY ["ICAP_ServiceBus/ICAP_ServiceBus.csproj", "ICAP_ServiceBus/"]
 RUN dotnet restore "./ICAP_RelationService/./ICAP_RelationService.csproj"
 COPY . .
-WORKDIR "/src/ICAP_RelationService"
+WORKDIR "/srcs/ICAP_RelationService"
 RUN dotnet build "./ICAP_RelationService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
