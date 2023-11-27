@@ -1,27 +1,18 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
-EXPOSE 5000
-EXPOSE 5100
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["../ICAP_AccountService/ICAP_AccountService.csproj", "ICAP_AccountService/"]
-COPY ["../ICAP_Infrastructure/ICAP_Infrastructure.csproj", "ICAP_Infrastructure/"]
-COPY ["../ICAP_ServiceBus/ICAP_ServiceBus.csproj", "ICAP_ServiceBus/"]
-RUN dotnet restore "./ICAP_AccountService/./ICAP_AccountService.csproj"
-COPY . .
-WORKDIR "/src/ICAP_AccountService"
-RUN dotnet build "./ICAP_AccountService.csproj" -c $BUILD_CONFIGURATION -o /app/build
+COPY *.csproj ./
+RUN dotnet restore
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./ICAP_AccountService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+COPY . ./
+RUN dotnet publish -c Release -o out
 
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build-env /app/out .
+
+EXPOSE 5000/tcp
+ENV ASPNETCORE_URLS http://*:5000
+HEALTHCHECK --interval=30s --timeout=3s --retries=1 CMD curl --silent --fail http://localhost:5000/hc || exit 1
+
 ENTRYPOINT ["dotnet", "ICAP_AccountService.dll"]
