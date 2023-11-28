@@ -103,7 +103,7 @@ jobs:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
         - name: Build and push image to ACR
           if: needs.filter.outputs[matrix.services]
-          run: az acr build --image $(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-'):${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/${{ matrix.services }}/Dockerfile ./
+          run: az acr build --image $(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-'):${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./
 
   deploy: 
     needs: [filter, build-image]
@@ -143,7 +143,7 @@ jobs:
         name: Deploys application
         with:
           action: deploy
-          images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]'):${{ github.sha }}
+          images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-'):${{ github.sha }}
           manifests: |
             ./srcs/${{ matrix.services }}/manifests/deployment.yaml
             ./srcs/${{ matrix.services }}/manifests/service.yaml

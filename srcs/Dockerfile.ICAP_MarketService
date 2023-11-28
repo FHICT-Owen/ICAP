@@ -1,11 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 
-COPY *.csproj ./
-RUN dotnet restore
-
-COPY . ./
-RUN dotnet publish -c Release -o out
+COPY ./ICAP_MarketService ./ICAP_MarketService
+COPY ./ICAP_Infrastructure ./ICAP_Infrastructure
+COPY ./ICAP_ServiceBus ./ICAP_ServiceBus
+RUN ls ./
+RUN dotnet restore ./ICAP_MarketService/*.csproj
+RUN dotnet publish ./ICAP_MarketService/*.csproj -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
