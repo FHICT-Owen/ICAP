@@ -2,11 +2,11 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: icap-relationservice
-  annotations:
-    kubernetes.io/ingress.class: azure/application-gateway
 spec:
+  ingressClassName: webapprouting.kubernetes.azure.com
   rules:
-  - http:
+  - host: <Hostname>
+    http:
       paths:
       - path: /relations
         pathType: Prefix
