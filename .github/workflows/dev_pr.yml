@@ -147,4 +147,5 @@ jobs:
           manifests: |
             ./srcs/${{ matrix.services }}/manifests/deployment.yaml
             ./srcs/${{ matrix.services }}/manifests/service.yaml
+            ./srcs/${{ matrix.services }}/manifests/ingress.yaml
           namespace: default
