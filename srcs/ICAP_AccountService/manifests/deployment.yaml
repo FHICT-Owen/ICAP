@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: icap-accountservice
-          image: icapregistry.azurecr.io/icap-accountservice:latest
+          image: icapregistry.azureacr.io/icap-accountservice:latest
           ports:
             - containerPort: 80
