@@ -4,7 +4,7 @@ metadata:
   name: icap-accountservice
   namespace: default
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: icap-accountservice
   ports:

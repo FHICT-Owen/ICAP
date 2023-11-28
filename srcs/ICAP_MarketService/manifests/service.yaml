@@ -4,7 +4,7 @@ metadata:
   name: icap-marketservice
   namespace: default
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: icap-marketservice
   ports:
