@@ -103,7 +103,7 @@ jobs:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
         - name: Build and push image to ACR
           if: needs.filter.outputs[matrix.services]
-          run: az acr build --image $(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-'):${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./
+          run: az acr build --image $(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-'):${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
 
   deploy: 
     needs: [filter, build-image]
