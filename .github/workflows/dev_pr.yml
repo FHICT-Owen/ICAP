@@ -137,7 +137,7 @@ jobs:
           admin: "true"
           cluster-name: ${{ env.CLUSTER_NAME }}
           resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
-          use-kubelogin: "true"
+          use-kubelogin: "false"
       - uses: Azure/k8s-deploy@v4
         if: needs.filter.outputs[matrix.services]
         name: Deploys application
