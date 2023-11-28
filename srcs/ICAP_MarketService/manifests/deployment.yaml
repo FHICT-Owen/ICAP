@@ -4,7 +4,7 @@ metadata:
   name: ICAP_MarketService
   labels:
     app: ICAP_MarketService
-  namespace: ICAP
+  namespace: default
 spec:
   replicas: 1
   selector:
