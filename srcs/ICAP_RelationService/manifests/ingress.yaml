@@ -8,6 +8,10 @@ spec:
   rules:
   - http:
       paths:
-      - backend:
-          serviceName: icap-relationservice
-          servicePort: 5200
+      - path: /relations
+        pathType: Prefix
+        backend:
+          service:
+            name: icap-relationservice
+            port: 
+              number: 5200

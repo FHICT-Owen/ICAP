@@ -8,6 +8,10 @@ spec:
   rules:
   - http:
       paths:
-      - backend:
-          serviceName: icap-accountservice
-          servicePort: 5000
+      - path: /accounts
+        pathType: Prefix
+        backend:
+          service:
+            name: icap-accountservice
+            port: 
+              number: 5000

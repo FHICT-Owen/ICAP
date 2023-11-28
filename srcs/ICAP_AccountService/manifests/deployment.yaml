@@ -19,4 +19,4 @@ spec:
         - name: icap-accountservice
           image: icap-accountservice:latest
           ports:
-            - containerPort: 5000
+            - containerPort: 80

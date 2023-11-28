@@ -9,5 +9,5 @@ spec:
     app: icap-marketservice
   ports:
     - protocol: TCP
-      port: 5001
+      port: 5100
       targetPort: 80

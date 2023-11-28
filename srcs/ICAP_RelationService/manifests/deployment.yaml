@@ -19,4 +19,4 @@ spec:
         - name: icap-relationservice
           image: icap-relationservice:latest
           ports:
-            - containerPort: 5002
+            - containerPort: 80

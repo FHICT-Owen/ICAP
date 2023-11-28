@@ -8,6 +8,10 @@ spec:
   rules:
   - http:
       paths:
-      - backend:
-          serviceName: icap-marketservice
-          servicePort: 5100
+      - path: /market
+        pathType: Prefix
+        backend:
+          service:
+            name: icap-marketservice
+            port: 
+              number: 5100
