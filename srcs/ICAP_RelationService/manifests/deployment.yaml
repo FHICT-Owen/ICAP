@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ICAP_RelationService
+  name: icap-relationService
   labels:
-    app: ICAP_RelationService
+    app: icap-relationService
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ICAP_RelationService
+      app: icap-relationService
   template:
     metadata:
       labels:
-        app: ICAP_RelationService
+        app: icap-relationService
     spec:
       containers:
-        - name: ICAP_RelationService
-          image: ICAP_RelationService:latest
+        - name: icap-relationService
+          image: icap-relationService:latest
           ports:
             - containerPort: 5002
