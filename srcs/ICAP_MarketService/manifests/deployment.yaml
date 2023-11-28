@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: icap-marketService
+  name: icap-marketservice
   labels:
-    app: icap-marketService
+    app: icap-marketservice
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: icap-marketService
+      app: icap-marketservice
   template:
     metadata:
       labels:
-        app: icap-marketService
+        app: icap-marketservice
     spec:
       containers:
-        - name: icap-marketService
-          image: icap-marketService:latest
+        - name: icap-marketservice
+          image: icap-marketservice:latest
           ports:
             - containerPort: 80
