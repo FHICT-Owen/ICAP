@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 env:
     ACR_RESOURCE_GROUP: ICAP
-    AZURE_CONTAINER_REGISTRY: ICAPregistry
+    AZURE_CONTAINER_REGISTRY: icapregistry
     CLUSTER_NAME: ICAP_AKS
     CLUSTER_RESOURCE_GROUP: ICAP
 
