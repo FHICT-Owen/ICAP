@@ -143,3 +143,9 @@ This is to make sure that no debug related logging features make it into product
 
 ### Secure API gateway
 An API Gateway acts as a control point to enforce access control, reducing the complexity within individual microservices and providing a unified authentication/authorization layer. This gateway can then also make it so there is only a single ingress point for the entire system.
+
+## Non-functional requirements
+The following non-functional requirements were formulated based off the premise of this risk analysis.
+- ICAP must support role-based access control mechanisms to ensure that only authorized users can access specific functions based on their roles.
+- All sensitive data stored by the software, including user credentials and personal information, must be encrypted both at rest and in transit using industry-standard encryption algorithms.
+- All secret variables should be managed through a secret store or GitHub secrets.
