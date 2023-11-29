@@ -101,9 +101,12 @@ jobs:
           name: Azure login
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
+        - name: Create ENV for name container image
+          run: |
+            echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
         - name: Build and push image to ACR
           if: needs.filter.outputs[matrix.services]
-          run: az acr build --image $(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-'):${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
+          run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
 
   deploy: 
     needs: [filter, build-image]
@@ -138,12 +141,15 @@ jobs:
           cluster-name: ${{ env.CLUSTER_NAME }}
           resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
           use-kubelogin: "true"
+      - name: Create ENV for name container image
+        run: |
+          echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
       - uses: Azure/k8s-deploy@v4
         if: needs.filter.outputs[matrix.services]
         name: Deploys application
         with:
           action: deploy
-          images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-'):${{ github.sha }}
+          images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONVERTED_IMAGE }}:${{ github.sha }}
           manifests: |
             ./srcs/${{ matrix.services }}/manifests/deployment.yaml
             ./srcs/${{ matrix.services }}/manifests/service.yaml
