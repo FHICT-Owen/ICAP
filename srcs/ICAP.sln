@@ -14,15 +14,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_Infrastructure", "ICAP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_RelationService", "ICAP_RelationService\ICAP_RelationService.csproj", "{D9C49325-57F6-4235-B2B1-38E55178EAB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_AccountService.Specs", "ICAP_AccountService.Specs\ICAP_AccountService.Specs.csproj", "{0307F58C-0276-45E0-A3F9-3EA16B898EED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_AccountService.Specs", "ICAP_AccountService.Specs\ICAP_AccountService.Specs.csproj", "{0307F58C-0276-45E0-A3F9-3EA16B898EED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_Client.Specs", "ICAP_Client.Specs\ICAP_Client.Specs.csproj", "{2AF2B337-85C4-4794-888F-E4484DF4B8B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_Client.Specs", "ICAP_Client.Specs\ICAP_Client.Specs.csproj", "{2AF2B337-85C4-4794-888F-E4484DF4B8B7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{F3215FD0-2647-4B53-B561-AC5D632B404D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_MarketService.Specs", "ICAP_MarketService.Specs\ICAP_MarketService.Specs.csproj", "{B47BDC92-373C-4D06-858F-DDAE5A0E6953}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_MarketService.Specs", "ICAP_MarketService.Specs\ICAP_MarketService.Specs.csproj", "{B47BDC92-373C-4D06-858F-DDAE5A0E6953}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICAP_RelationService.Specs", "ICAP_RelationService.Specs\ICAP_RelationService.Specs.csproj", "{13AC375D-84A4-4EDF-805F-BE86F7148272}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICAP_RelationService.Specs", "ICAP_RelationService.Specs\ICAP_RelationService.Specs.csproj", "{13AC375D-84A4-4EDF-805F-BE86F7148272}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
