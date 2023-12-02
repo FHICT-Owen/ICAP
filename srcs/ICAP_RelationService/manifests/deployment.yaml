@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: icap-relationservice
+  labels:
+    app: icap-relationservice
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: icap-relationservice
+  template:
+    metadata:
+      labels:
+        app: icap-relationservice
+    spec:
+      containers:
+        - name: icap-relationservice
+          image: icapregistry.azurecr.io/icap-relationservice:latest
+          ports:
+            - containerPort: 80

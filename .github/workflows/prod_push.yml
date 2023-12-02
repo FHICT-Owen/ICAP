@@ -9,59 +9,149 @@ on:
     paths:
       - "srcs/**"
   workflow_dispatch:
+env:
+    ACR_RESOURCE_GROUP: ICAP
+    AZURE_CONTAINER_REGISTRY: icapregistry
+    CLUSTER_NAME: ICAP_AKS
+    CLUSTER_RESOURCE_GROUP: ICAP
 
 jobs:
   filter:
     runs-on: ubuntu-latest
     outputs:
-      client: ${{ steps.filter.outputs.client }}
-      accountservice: ${{ steps.filter.outputs.accountservice }}
-      friendservice: ${{ steps.filter.outputs.friendservice }}
-      marketservice: ${{ steps.filter.outputs.marketservice }}
-      servicebus: ${{ steps.filter.outputs.servicebus }}
+      ICAP_Client: ${{ steps.filter.outputs.ICAP_Client }}
+      ICAP_AccountService: ${{ steps.filter.outputs.ICAP_AccountService }}
+      ICAP_MarketService: ${{ steps.filter.outputs.ICAP_MarketService }}
+      ICAP_RelationService: ${{ steps.filter.outputs.ICAP_RelationService }}
+      ICAP_ServiceBus: ${{ steps.filter.outputs.ICAP_ServiceBus }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v2
       id: filter
       with:
         filters: |
-          client:
+          ICAP_Client:
             - 'srcs/ICAP_Client/**'
-          accountservice:
+          ICAP_AccountService:
             - 'srcs/ICAP_AccountService/**'
-          friendservice:
-            - 'srcs/ICAP_Client/**'
-          marketservice:
+          ICAP_MarketService:
             - 'srcs/ICAP_MarketService/**'
-          servicebus:
+          ICAP_RelationService:
+            - 'srcs/ICAP_RelationService/**'
+          ICAP_ServiceBus:
             - 'srcs/ICAP_ServiceBus/**'
+        base: 'production'      
+
   build-and-test:
     needs: filter
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [client, accountservice, friendservice, marketservice, servicebus] # Add more services as needed
-    if: ${{ needs.filter.outputs[matrix.service] == 'true' }}
+        services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService, ICAP_ServiceBus]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+      if: needs.filter.outputs[matrix.services]
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+      if: needs.filter.outputs[matrix.services]
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '7.0.x'
+        dotnet-version: '8.0.x'
     - name: Build
+      if: needs.filter.outputs[matrix.services]
       run: |
-        cd ./srcs/${{ matrix.service }}
-        dotnet build --no-restore $(ls *.csproj)
+        cd ./srcs/${{ matrix.services }}
+        dotnet build $(ls *.csproj)
 
-    - name: Unit Tests
+    - name: SpecFlow Tests
+      if: needs.filter.outputs[matrix.services]
       run: |
-        cd ./srcs/${{ matrix.service }}
+        cd ./srcs/${{ matrix.services }}.Specs
         dotnet test --no-build $(ls *.csproj)
 
     - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
+      if: needs.filter.outputs[matrix.services]
+      uses: highbyte/sonarscan-dotnet@v2.3.0
+      with:
+        # The key of the SonarQube project
+        sonarProjectKey: FHICT-Owen_ICAP
+        # The name of the SonarQube project
+        sonarProjectName: ICAP
+        # The name of the SonarQube organization in SonarCloud. For hosted SonarQube, skip this setting.
+        sonarOrganization: fhict-s-owen
+        dotnetBuildArguments: ./srcs/${{ matrix.services }}
+        dotnetDisableTests: true
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        projectBaseDir: "./srcs/${{ matrix.service }}"
+
+  build-image:
+    needs: [filter, build-and-test]
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
+    steps:
+        - uses: actions/checkout@v4
+          if: needs.filter.outputs[matrix.services]
+        - uses: azure/login@v1
+          if: needs.filter.outputs[matrix.services]
+          name: Azure login
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+        - name: Create ENV for name container image
+          run: |
+            echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
+        - name: Build and push image to ACR
+          if: needs.filter.outputs[matrix.services]
+          run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
+
+  deploy: 
+    needs: [filter, build-image]
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
+    steps:
+      - name: See filter output
+        run: echo "The value is ${{ needs.filter.outputs[matrix.services] }}"
+      - uses: actions/checkout@v4
+        if: needs.filter.outputs[matrix.services]
+      - uses: azure/login@v1
+        if: needs.filter.outputs[matrix.services]
+        name: Azure login
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - uses: azure/use-kubelogin@v1
+        if: needs.filter.outputs[matrix.services]
+        name: Set up kubelogin for non-interactive login
+        with:
+          kubelogin-version: v0.0.25
+      - uses: azure/aks-set-context@v3
+        if: needs.filter.outputs[matrix.services]
+        name: Get K8s context
+        with:
+          admin: "true"
+          cluster-name: ${{ env.CLUSTER_NAME }}
+          resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+          use-kubelogin: "true"
+      - name: Create ENV for name container image
+        run: |
+          echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
+      - uses: Azure/k8s-deploy@v4
+        if: needs.filter.outputs[matrix.services]
+        name: Deploys application
+        with:
+          action: deploy
+          images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONVERTED_IMAGE }}:${{ github.sha }}
+          manifests: |
+            ./srcs/${{ matrix.services }}/manifests/deployment.yaml
+            ./srcs/${{ matrix.services }}/manifests/service.yaml
+            ./srcs/${{ matrix.services }}/manifests/ingress.yaml
+          namespace: default

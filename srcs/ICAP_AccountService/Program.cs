@@ -6,8 +6,7 @@ using ICAP_ServiceBus;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
-builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 

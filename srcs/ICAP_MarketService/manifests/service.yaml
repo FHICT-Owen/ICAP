@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: icap-marketservice
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: icap-marketservice
+  ports:
+    - protocol: TCP
+      port: 5100
+      targetPort: 80

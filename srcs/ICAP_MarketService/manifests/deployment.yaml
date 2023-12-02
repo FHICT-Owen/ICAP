@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: icap-marketservice
+  labels:
+    app: icap-marketservice
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: icap-marketservice
+  template:
+    metadata:
+      labels:
+        app: icap-marketservice
+    spec:
+      containers:
+        - name: icap-marketservice
+          image: icapregistry.azurecr.io/icap-marketservice:latest
+          ports:
+            - containerPort: 80

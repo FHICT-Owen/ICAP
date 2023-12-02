@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: icap-accountservice
+  labels:
+    app: icap-accountservice
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: icap-accountservice
+  template:
+    metadata:
+      labels:
+        app: icap-accountservice
+    spec:
+      containers:
+        - name: icap-accountservice
+          image: icapregistry.azurecr.io/icap-accountservice:latest
+          ports:
+            - containerPort: 80
