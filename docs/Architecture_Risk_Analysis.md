@@ -121,28 +121,38 @@ The following abuse cases were formulated based on some of the user stories with
 - *As an attacker, I exploit misconfigured keystores to access secrets that could give me elevated system access.*
 
 ## Mitigations
-In the following section mitigations, for making sure the misuse cases from the previous section can not be applied, are shown.
+In the following section mitigations, for making sure the misuse cases from the previous section can not be applied, are shown. These mitigations are devided per the four categories from the misuse cases.
 
-### Authentication & Authorization
+### 1. Known Vulnerabilities
+#### Static code analysis
+Making use of a platform like sonarqube/sonarcloud in order to do static code analysis to find out whether there are vulnerable parts of code being used that can be exploited is a big part of mitigating known vulnerabilities.
+
+#### Dependabot alerts
+GitHub has built-in functionality that makes sure that any known package vulnerabilities can be patched by updating the package versions. Doing so patches code vulnerabilities caused by dependencies.
+
+### 2. Broken Access Control
+#### Authentication & Authorization
 The application should have a service or already well-established mechanism of authorizing users and requests to make sure that bad actors do not gain access to parts of the system that they should not have access to. This includes a way to secure all services by checking if requests that come in have the proper authority to access the endpoint in question. 
 
-### Message Bus
-Using Azure Service bus as the main messaging bus means that requests are always encrypted using TLS. This makes sure that any messages that get intercepted are still unreadable.
-
-### Azure Key Vault
-The use of Azure Key Vault makes sure that any secrets for the front- and back-end are stored securely and not easily accessible to end-users. 
-
-### Principle of Least Privilege
+#### Principle of Least Privilege
 Apply the principle of least privilege to microservice access controls. This minimizes each service's access to only what is necessary, reducing the potential impact of a compromised service.
 
-### Use of WSS
+#### Secure API gateway
+An API Gateway acts as a control point to enforce access control, reducing the complexity within individual microservices and providing a unified authentication/authorization layer. This gateway can then also make it so there is only a single ingress point for the entire system.
+
+### 3. Messages
+#### Use of WSS
 Make sure that when websockets are established for messaging, the WSS protocol is used so all messages are secured.
 
-### Separate configs for production and staging
+#### Message Bus
+Using Azure Service bus as the main messaging bus means that requests are always encrypted using TLS. This makes sure that any messages that get intercepted are still unreadable.
+
+### 4. Security Misconfiguration
+#### Separate configs for production and staging
 This is to make sure that no debug related logging features make it into production code that can then be used to gain more information about the system. 
 
-### Secure API gateway
-An API Gateway acts as a control point to enforce access control, reducing the complexity within individual microservices and providing a unified authentication/authorization layer. This gateway can then also make it so there is only a single ingress point for the entire system.
+#### Azure Key Vault
+The use of Azure Key Vault makes sure that any secrets for the front- and back-end are stored securely and not easily accessible to end-users. 
 
 ## Non-functional requirements
 The following non-functional requirements were formulated based off the premise of this risk analysis.
