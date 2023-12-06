@@ -1,0 +1,23 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: quick-start
+  namespace: ICAP
+  labels:
+    azure.workload.identity/use: "true"
+spec:
+  serviceAccountName: ICAP_BACKEND
+  containers:
+    - name: icap-accountservice
+      image: icapregistry.azurecr.io/icap-accountservice:latest      
+      volumeMounts:
+      - name: secrets-store-accountservice
+        mountPath: "/mnt/secrets-store"
+        readOnly: true
+  volumes:
+    - name: 
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: "icap-accountservice-kv"
