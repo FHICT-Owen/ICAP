@@ -23,7 +23,7 @@ spec:
           volumeMounts:
             - name: secrets-store-accountservice
               mountPath: "/mnt/secrets-store"
-              readOnly: true'
+              readOnly: true
       volumes:
         - name: secrets-store-accountservice
           csi:
