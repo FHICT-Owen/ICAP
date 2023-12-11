@@ -1,5 +1,4 @@
 ﻿using ICAP_Infrastructure.Entities;
-using ICAP_Infrastructure.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
@@ -19,7 +18,9 @@ namespace ICAP_Infrastructure.Repositories
             services.AddSingleton(serviceProvider =>
             {
                 var configuration = serviceProvider.GetService<IConfiguration>() ?? throw new ArgumentNullException(nameof(IConfiguration));
-                var mongoClient = new MongoClient(configuration["MongoConnectionString"]);
+                var settings = MongoClientSettings.FromConnectionString(configuration["MongoConnectionString"]);
+                settings.ServerApi = new ServerApi(ServerApiVersion.V1);
+                var mongoClient = new MongoClient(settings);
                 return mongoClient.GetDatabase(configuration["MongoDatabaseName"]);
             });
 
