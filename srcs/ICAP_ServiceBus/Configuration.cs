@@ -8,13 +8,13 @@ namespace ICAP_ServiceBus
         public static void UseAzureServiceBusHandler(this IServiceCollection services, IConfiguration config)
         {
             services.AddTransient<IBusHandler>(_ =>
-                new BusHandler(config.GetConnectionString("AzureServiceBus")));
+                new BusHandler(config["AzureServiceBus"] ?? throw new ArgumentNullException()));
         }
 
         public static void UseAzureServiceBusPublisher(this IServiceCollection services, IConfiguration config)
         {
             services.AddTransient<IBusPublisher>(_ =>
-                new BusPublisher(config.GetConnectionString("AzureServiceBus")));
+                new BusPublisher(config["AzureServiceBus"] ?? throw new ArgumentNullException()));
         }
     }
 }

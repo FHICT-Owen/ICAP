@@ -19,10 +19,8 @@ namespace ICAP_Infrastructure.Repositories
             services.AddSingleton(serviceProvider =>
             {
                 var configuration = serviceProvider.GetService<IConfiguration>() ?? throw new ArgumentNullException(nameof(IConfiguration));
-                var mongoDbSettings = configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
-                var serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
-                var mongoClient = new MongoClient(mongoDbSettings.ConnectionString);
-                return mongoClient.GetDatabase(serviceSettings.ServiceName);
+                var mongoClient = new MongoClient(configuration["MongoConnectionString"]);
+                return mongoClient.GetDatabase(configuration["MongoDatabaseName"]);
             });
 
             return services;
