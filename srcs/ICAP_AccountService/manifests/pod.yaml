@@ -2,7 +2,7 @@ kind: Pod
 apiVersion: v1
 metadata:
   name: quick-start
-  namespace: ICAP
+  namespace: default
   labels:
     azure.workload.identity/use: "true"
 spec:
