@@ -12,7 +12,7 @@ spec:
         mountPath: "/mnt/secrets-store"
         readOnly: true
   volumes:
-    - name: 
+    - name: secrets-store-accountservice
       csi:
         driver: secrets-store.csi.k8s.io
         readOnly: true
