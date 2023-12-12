@@ -154,4 +154,5 @@ jobs:
             ./srcs/${{ matrix.services }}/manifests/deployment.yaml
             ./srcs/${{ matrix.services }}/manifests/service.yaml
             ./srcs/${{ matrix.services }}/manifests/ingress.yaml
+            ./srcs/${{ matrix.services }}/manifests/secretprovider.yaml
           namespace: default

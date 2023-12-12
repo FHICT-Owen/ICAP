@@ -1,4 +1,3 @@
-using Azure.Identity;
 using ICAP_AccountService.Entities;
 using ICAP_AccountService.Events;
 using ICAP_Infrastructure.Repositories;

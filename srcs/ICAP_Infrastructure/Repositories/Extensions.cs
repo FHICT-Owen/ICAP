@@ -1,10 +1,6 @@
 ﻿using ICAP_Infrastructure.Entities;
-using ICAP_Infrastructure.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 namespace ICAP_Infrastructure.Repositories
@@ -13,16 +9,13 @@ namespace ICAP_Infrastructure.Repositories
     {
         public static IServiceCollection AddMongo(this IServiceCollection services)
         {
-            BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
-            BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
-
             services.AddSingleton(serviceProvider =>
             {
                 var configuration = serviceProvider.GetService<IConfiguration>() ?? throw new ArgumentNullException(nameof(IConfiguration));
-                var mongoDbSettings = configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
-                var serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
-                var mongoClient = new MongoClient(mongoDbSettings.ConnectionString);
-                return mongoClient.GetDatabase(serviceSettings.ServiceName);
+                var settings = MongoClientSettings.FromConnectionString(configuration["MongoConnectionString"]);
+                settings.ServerApi = new ServerApi(ServerApiVersion.V1);
+                var mongoClient = new MongoClient(settings);
+                return mongoClient.GetDatabase(configuration["MongoDatabaseName"]);
             });
 
             return services;
