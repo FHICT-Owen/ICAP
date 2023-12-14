@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: icap-relationservice
-          image: icapregistry.azurecr.io/icap-relationservice:latest
+          image: icapacr.azurecr.io/icap-relationservice:latest
           ports:
             - containerPort: 80
           volumeMounts:
