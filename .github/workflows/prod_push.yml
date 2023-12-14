@@ -1,17 +1,18 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: Merge into Production
+name: Pull Request DEV
 
 on:
-  push:
+  pull_request:
     branches: "production"
     paths:
       - "srcs/**"
+      - ".github/workflows/**"
   workflow_dispatch:
 env:
     ACR_RESOURCE_GROUP: ICAP
-    AZURE_CONTAINER_REGISTRY: icapregistry
+    AZURE_CONTAINER_REGISTRY: ICAPACR
     CLUSTER_NAME: ICAP_AKS
     CLUSTER_RESOURCE_GROUP: ICAP
 
@@ -39,8 +40,7 @@ jobs:
           ICAP_RelationService:
             - 'srcs/ICAP_RelationService/**'
           ICAP_ServiceBus:
-            - 'srcs/ICAP_ServiceBus/**'
-        base: 'production'      
+            - 'srcs/ICAP_ServiceBus/**'     
 
   build-and-test:
     needs: filter
@@ -50,26 +50,26 @@ jobs:
         services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService, ICAP_ServiceBus]
     steps:
     - uses: actions/checkout@v4
-      if: needs.filter.outputs[matrix.services]
+      if: needs.filter.outputs[matrix.services] == true
     - name: Setup .NET Core
-      if: needs.filter.outputs[matrix.services]
+      if: needs.filter.outputs[matrix.services] == true
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
     - name: Build
-      if: needs.filter.outputs[matrix.services]
+      if: needs.filter.outputs[matrix.services] == true
       run: |
         cd ./srcs/${{ matrix.services }}
         dotnet build $(ls *.csproj)
 
     - name: SpecFlow Tests
-      if: needs.filter.outputs[matrix.services]
+      if: needs.filter.outputs[matrix.services] == true
       run: |
         cd ./srcs/${{ matrix.services }}.Specs
         dotnet test --no-build $(ls *.csproj)
 
     - name: SonarCloud Scan
-      if: needs.filter.outputs[matrix.services]
+      if: needs.filter.outputs[matrix.services] == true
       uses: highbyte/sonarscan-dotnet@v2.3.0
       with:
         # The key of the SonarQube project
@@ -95,9 +95,9 @@ jobs:
         services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
         - uses: actions/checkout@v4
-          if: needs.filter.outputs[matrix.services]
+          if: needs.filter.outputs[matrix.services] == true
         - uses: azure/login@v1
-          if: needs.filter.outputs[matrix.services]
+          if: needs.filter.outputs[matrix.services] == true
           name: Azure login
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -105,7 +105,7 @@ jobs:
           run: |
             echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
         - name: Build and push image to ACR
-          if: needs.filter.outputs[matrix.services]
+          if: needs.filter.outputs[matrix.services] == true
           run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
 
   deploy: 
@@ -120,24 +120,24 @@ jobs:
         services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
       - name: See filter output
-        run: echo "The value is ${{ needs.filter.outputs[matrix.services] }}"
+        run: echo "The value is ${{ needs.filter.outputs[matrix.services] == true }}"
       - uses: actions/checkout@v4
-        if: needs.filter.outputs[matrix.services]
+        if: needs.filter.outputs[matrix.services] == true
       - uses: azure/login@v1
-        if: needs.filter.outputs[matrix.services]
+        if: needs.filter.outputs[matrix.services] == true
         name: Azure login
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - uses: azure/use-kubelogin@v1
-        if: needs.filter.outputs[matrix.services]
+        if: needs.filter.outputs[matrix.services] == true
         name: Set up kubelogin for non-interactive login
         with:
           kubelogin-version: v0.0.25
       - uses: azure/aks-set-context@v3
-        if: needs.filter.outputs[matrix.services]
+        if: needs.filter.outputs[matrix.services] == true
         name: Get K8s context
         with:
-          admin: "true"
+          admin: "false"
           cluster-name: ${{ env.CLUSTER_NAME }}
           resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
           use-kubelogin: "true"
@@ -145,7 +145,7 @@ jobs:
         run: |
           echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
       - uses: Azure/k8s-deploy@v4
-        if: needs.filter.outputs[matrix.services]
+        if: needs.filter.outputs[matrix.services] == true
         name: Deploys application
         with:
           action: deploy
