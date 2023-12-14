@@ -102,7 +102,6 @@ jobs:
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
         - name: Create ENV for name container image
-          if: needs.filter.outputs[matrix.services] == 'true'
           run: |
             echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
         - name: Build and push image to ACR
@@ -141,7 +140,6 @@ jobs:
           resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
           use-kubelogin: "true"
       - name: Create ENV for name container image
-        if: needs.filter.outputs[matrix.services] == 'true'
         run: |
           echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
       - uses: Azure/k8s-deploy@v4
