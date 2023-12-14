@@ -49,6 +49,8 @@ jobs:
       matrix:
         services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService, ICAP_ServiceBus]
     steps:
+    - name: See filter output
+      run: echo "The value is ${{ needs.filter.outputs[matrix.services] }}"
     - uses: actions/checkout@v4
       if: needs.filter.outputs[matrix.services] == true
     - name: Setup .NET Core
