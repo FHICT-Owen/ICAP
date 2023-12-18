@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 env:
     ACR_RESOURCE_GROUP: ICAP
-    AZURE_CONTAINER_REGISTRY: icapregistry
+    AZURE_CONTAINER_REGISTRY: icapacr
     CLUSTER_NAME: ICAP_AKS
     CLUSTER_RESOURCE_GROUP: ICAP
 
@@ -39,8 +39,7 @@ jobs:
           ICAP_RelationService:
             - 'srcs/ICAP_RelationService/**'
           ICAP_ServiceBus:
-            - 'srcs/ICAP_ServiceBus/**'
-        base: 'production'      
+            - 'srcs/ICAP_ServiceBus/**'     
 
   build-and-test:
     needs: filter
@@ -49,6 +48,8 @@ jobs:
       matrix:
         services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService, ICAP_ServiceBus]
     steps:
+    - name: See filter output
+      run: echo "The value is ${{ needs.filter.outputs[matrix.services] }}"
     - uses: actions/checkout@v4
       if: needs.filter.outputs[matrix.services]
     - name: Setup .NET Core
@@ -137,7 +138,7 @@ jobs:
         if: needs.filter.outputs[matrix.services]
         name: Get K8s context
         with:
-          admin: "true"
+          admin: "false"
           cluster-name: ${{ env.CLUSTER_NAME }}
           resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
           use-kubelogin: "true"

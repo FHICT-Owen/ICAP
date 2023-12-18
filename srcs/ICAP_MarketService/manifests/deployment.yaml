@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: icap-marketservice
-          image: icapregistry.azurecr.io/icap-marketservice:latest
+          image: icapacr.azurecr.io/icap-marketservice:latest
           ports:
             - containerPort: 80
           volumeMounts:
