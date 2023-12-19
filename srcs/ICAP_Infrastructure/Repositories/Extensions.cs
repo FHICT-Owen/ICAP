@@ -24,7 +24,7 @@ namespace ICAP_Infrastructure.Repositories
         public static IServiceCollection AddMongoRepository<T>(this IServiceCollection services, string collectionName)
             where T : IEntity
         {
-            services.AddSingleton<IRepository<T>>(serviceProvider =>
+            services.AddTransient<IRepository<T>>(serviceProvider =>
             {
                 var database = serviceProvider.GetService<IMongoDatabase>();
                 return new MongoRepository<T>(database ?? throw new InvalidOperationException(), collectionName);
