@@ -15,7 +15,7 @@
                 <MudButton OnClick="LogOut" Variant="Variant.Filled" Color="Color.Error">Log Out</MudButton>
             </Authorized>
             <NotAuthorized>
-                <MudButton OnClick="LogIn" Variant="Variant.Filled" Color="Color.Error">Log In</MudButton>
+                <MudButton OnClick="LogIn" Variant="Variant.Filled" Color="Color.Success">Log In</MudButton>
             </NotAuthorized>
         </AuthorizeView>
     </MudAppBar>
@@ -26,7 +26,7 @@
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-2 pt-2">
             @Body
         </MudContainer>
     </MudMainContent>
