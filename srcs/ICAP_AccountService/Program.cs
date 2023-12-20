@@ -2,12 +2,16 @@ using ICAP_AccountService.Entities;
 using ICAP_AccountService.Events;
 using ICAP_Infrastructure.Repositories;
 using ICAP_ServiceBus;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApi(builder.Configuration, "AzureAd");
 
 builder.Services.AddControllers(options =>
 {
@@ -35,6 +39,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -1,9 +1,13 @@
 ﻿using ICAP_Infrastructure.Repositories;
 using ICAP_RelationService.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
 
 namespace ICAP_RelationService.Controllers
 {
+    [Authorize]
+    [RequiredScope("access_as_user")]
     [ApiController]
     [Route("[controller]")]
     public class FriendRequestsController(IRepository<FriendRequest> friendRequestsRepository) : ControllerBase
