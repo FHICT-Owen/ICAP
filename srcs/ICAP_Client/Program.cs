@@ -12,6 +12,7 @@ builder.Services.AddMudServices();
 builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
+    options.ProviderOptions.LoginMode = "redirect";
     options.ProviderOptions.DefaultAccessTokenScopes.Add("https://graph.microsoft.com/User.Read");
 });
 
