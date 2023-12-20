@@ -6,26 +6,24 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="0">
+    <MudAppBar Elevation="0" Color="Color.Dark">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Custom.Brands.MudBlazor" Color="Color.Inherit" Link="https://mudblazor.com/" Target="_blank" />
-        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/MudBlazor/MudBlazor/" Target="_blank" />
+        <AuthorizeView>
+            <Authorized>
+            <MudText Typo="Typo.body1">Welcome, @context.User.Identity?.Name</MudText>
+                <MudButton OnClick="LogOut" Variant="Variant.Filled" Color="Color.Error">Log Out</MudButton>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton OnClick="LogIn" Variant="Variant.Filled" Color="Color.Error">Log In</MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
         <MudDrawerHeader>
             <MudText Typo="Typo.h6">ICAP_Client</MudText>
         </MudDrawerHeader>
         <NavMenu />
-        <AuthorizeView>
-            <Authorized>
-                <MudText Typo="Typo.body1">Welcome, @context.User.Identity?.Name</MudText>
-                <MudButton @OnClick="LogOut", Color="Color.Error">Log Out</MudButton>
-            </Authorized>
-            <NotAuthorized>
-                <MudButton @OnClick="LogIn" , Color="Color.Error">Log In</MudButton>
-            </NotAuthorized>
-        </AuthorizeView>
     </MudDrawer>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
