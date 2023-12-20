@@ -5,7 +5,7 @@ name: Pull Request DEV
 
 on:
   pull_request:
-    branches: "production"
+    branches: ["production"]
     paths:
       - "srcs/**"
       - ".github/workflows/**"
