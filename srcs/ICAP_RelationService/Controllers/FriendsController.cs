@@ -1,32 +1,30 @@
 ﻿using ICAP_Infrastructure.Repositories;
 using ICAP_RelationService.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
 
 namespace ICAP_RelationService.Controllers
 {
+    [Authorize]
+    [RequiredScope("access_as_user")]
     [ApiController]
-    [Route("friends")]
-    public class FriendsController : ControllerBase
+    [Route("[controller]")]
+    public class FriendsController(IRepository<Friends> friendsRepository) : ControllerBase
     {
-        private readonly IRepository<Friends> _friendsRepository;
-
-        public FriendsController(IRepository<Friends> friendsRepository)
-        {
-            _friendsRepository = friendsRepository;
-        }
-
         [HttpGet]
-        public async Task<IEnumerable<Friends>> GetAsync()
+        public async Task<ActionResult<IEnumerable<Friends>>> GetAsync()
         {
-            var items = await _friendsRepository.GetAllAsync();
-            return items;
+            var items = await friendsRepository.GetAllAsync();
+            return Ok(items);
         }
 
-        [HttpPost("{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Friends>> GetByIdAsync(string id)
         {
-            var item = await _friendsRepository.GetAsync(id);
-            return item;
+            var item = await friendsRepository.GetAsync(id);
+            if (item is null) return NotFound();
+            return Ok(item);
         }
 
         [HttpPost]
@@ -37,16 +35,17 @@ namespace ICAP_RelationService.Controllers
                 FriendIds = data.FriendIds
             };
 
-            await _friendsRepository.CreateAsync(request);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = request.Id }, request);
+            await friendsRepository.CreateAsync(request);
+            return CreatedAtRoute(nameof(GetByIdAsync), new { id = request.Id }, request);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> RemoveFriendAsync(string id)
         {
-            var existingItem = await _friendsRepository.GetAsync(id);
-            await _friendsRepository.UpdateAsync(existingItem);
-            return NoContent();
+            var existingItem = await friendsRepository.GetAsync(id);
+            if (existingItem is null) return NotFound();
+            await friendsRepository.UpdateAsync(existingItem);
+            return Ok();
         }
     }
 }

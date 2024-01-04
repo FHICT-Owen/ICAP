@@ -1,9 +1,13 @@
 ﻿using ICAP_AccountService.Entities;
 using ICAP_Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
 
 namespace ICAP_AccountService.Controllers
 {
+    [Authorize]
+    [RequiredScope("access_as_user")]
     [ApiController]
     [Route("users")]
     public class UsersController : ControllerBase

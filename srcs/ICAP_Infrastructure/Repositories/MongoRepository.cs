@@ -24,13 +24,13 @@ namespace ICAP_Infrastructure.Repositories
             return await _dbCollection.Find(filter).ToListAsync();
         }
 
-        public async Task<T> GetAsync(string id)
+        public async Task<T?> GetAsync(string id)
         {
             var filter = _filterBuilder.Eq(entity => entity.Id, id);
             return await _dbCollection.Find(filter).FirstOrDefaultAsync();
         }
 
-        public async Task<T> GetAsync(Expression<Func<T, bool>> filter)
+        public async Task<T?> GetAsync(Expression<Func<T, bool>> filter)
         {
             return await _dbCollection.Find(filter).FirstOrDefaultAsync();
         }

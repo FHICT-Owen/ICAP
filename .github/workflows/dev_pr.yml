@@ -5,7 +5,7 @@ name: Pull Request DEV
 
 on:
   pull_request:
-    branches: "production"
+    branches: ["production"]
     paths:
       - "srcs/**"
       - ".github/workflows/**"
@@ -94,21 +94,42 @@ jobs:
       matrix:
         services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
-        - uses: actions/checkout@v4
-          if: needs.filter.outputs[matrix.services] == 'true'
-        - uses: azure/login@v1
-          if: needs.filter.outputs[matrix.services] == 'true'
-          name: Azure login
-          with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
-        - name: Create ENV for name container image
-          run: |
-            echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
-        - name: Build and push image to ACR
-          if: needs.filter.outputs[matrix.services] == 'true'
-          run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
+      - uses: actions/checkout@v4
+        if: needs.filter.outputs[matrix.services] == 'true'
+      - uses: azure/login@v1
+        if: needs.filter.outputs[matrix.services] == 'true'
+        name: Azure login
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Create ENV for name container image
+        run: |
+          echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
+      - name: Build and push image to ACR
+        if: needs.filter.outputs[matrix.services] == 'true'
+        run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
+  
+  deploy-client:
+    needs: [filter, build-and-test]
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v4
+      if: needs.filter.outputs[matrix.services] == 'true'
+      with:
+        submodules: true
+        lfs: false
+    - name: Build And Deploy
+      if: needs.filter.outputs[matrix.services] == 'true'
+      id: builddeploy
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AMBITIOUS_OCEAN_0C5E26903  }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "/"
+        api_location: ""
+        output_location: "wwwroot"
 
-  deploy: 
+  deploy-services: 
     needs: [filter, build-image]
     permissions:
       actions: read
