@@ -242,7 +242,7 @@ Not applicable.
 
 Below here is a list that summarizes all the action points needed to make ICAP fully GDPR compliant before release.
 
-- Report on what information is collected, where it is stored, and who has access to it.
+- Create a ledger for where information is stored, and who has access to it.
 - Write a privacy policy.
 - Keep data protection in mind at all times & update risk analysis and privacy policy if needed.
 - Add the option to hide address information, make users primarily known to each other by their nicknames and have an option to show full name to friends.
