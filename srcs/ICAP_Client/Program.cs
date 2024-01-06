@@ -19,10 +19,7 @@ builder.Services.AddAuthorizationCore(options =>
 {
     options.AddPolicy("icap_admins", policy =>
     {
-        policy.RequireAssertion(context => context.User.HasClaim(c =>
-        {
-            return c.Type == "groups" && c.Value.Contains(builder.Configuration["groups:icap_admins"]);
-        }));
+        policy.RequireAssertion(context => context.User.HasClaim(c => c.Type == "groups" && c.Value.Contains(builder.Configuration["groups:icap_admins"])));
     });
 });
 
