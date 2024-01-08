@@ -41,10 +41,10 @@ Key Azure services such as Azure Entra Identity, Azure Kubernetes Service (AKS),
 | Description                             | Cost                         |
 |-----------------------------------------|------------------------------|
 | Base charge                             | $0.0135/hour                 |
-| First 13M operations/month               | Included                     |
-| Next 87M ops (13-100M ops)/month         | $0.80 per million operations |
-| Next 2,400M ops (100-2,500M ops)/month   | $0.50 per million operations |
-| Over 2,500M ops/month                    | $0.20 per million operations |
+| First 13M operations/month              | Included                     |
+| Next 87M ops (13-100M ops)/month        | $0.80 per million operations |
+| Next 2,400M ops (100-2,500M ops)/month  | $0.50 per million operations |
+| Over 2,500M ops/month                   | $0.20 per million operations |
 
 For the premium version, the pricing is very simple at a fixed cost of $0.928/hour.
 
