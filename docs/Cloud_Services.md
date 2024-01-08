@@ -48,7 +48,7 @@ Key Azure services such as Azure Entra Identity, Azure Kubernetes Service (AKS),
 
 For the premium version, the pricing is very simple at a fixed cost of $0.928/hour.
 
-### Sonarcloud 
+## Sonarcloud 
 - **Usage**: Sonarcloud is used in the CI/CD pipeline of ICAP to perform static code analyses. Using these static code analyses, vulnerabilities and flaws within ICAP can be easily identified and solved.
 
 ## Sources

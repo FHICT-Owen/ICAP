@@ -5,8 +5,8 @@ metadata:
 spec:
   ingressClassName: webapprouting.kubernetes.azure.com
   rules:
-  - host:
-    http:
+  - http:
+    host: aks.odb-tech.com
       paths:
       - path: /accounts
         pathType: Prefix
@@ -14,4 +14,4 @@ spec:
           service:
             name: icap-accountservice
             port: 
-              number: 5000
+              number: 80
