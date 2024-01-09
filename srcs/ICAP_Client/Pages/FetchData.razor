@@ -1,7 +1,6 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
-@using ICAP_Client.Shared
-
+@attribute [Authorize(Policy = "icap_admins")]
 <PageTitle>Weather forecast</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">Weather forecast</MudText>

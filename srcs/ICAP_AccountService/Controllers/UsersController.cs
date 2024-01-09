@@ -10,26 +10,19 @@ namespace ICAP_AccountService.Controllers
     [RequiredScope("access_as_user")]
     [ApiController]
     [Route("users")]
-    public class UsersController : ControllerBase
+    public class UsersController(IRepository<User> usersRepository) : ControllerBase
     {
-        private readonly IRepository<User> _usersRepository;
-
-        public UsersController(IRepository<User> usersRepository)
-        {
-            _usersRepository = usersRepository;
-        }
-
         [HttpGet]
         public async Task<IEnumerable<User>> GetAsync()
         {
-            var items = await _usersRepository.GetAllAsync();
+            var items = await usersRepository.GetAllAsync();
             return items;
         }
 
         [HttpPost("{id}")]
         public async Task<ActionResult<User>> GetByIdAsync(string id)
         {
-            var item = await _usersRepository.GetAsync(id);
+            var item = await usersRepository.GetAsync(id);
             return item;
         }
 
@@ -43,18 +36,18 @@ namespace ICAP_AccountService.Controllers
                 CreatedDateTime = DateTimeOffset.Now
             };
 
-            await _usersRepository.CreateAsync(request);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = request.Id }, request);
+            await usersRepository.CreateAsync(request);
+            return CreatedAtRoute(nameof(GetByIdAsync), new { id = request.Id }, request);
         }
 
         [HttpPut]
         public async Task<IActionResult> PutAsync(User data)
         {
-            var existingItem = await _usersRepository.GetAsync(data.Id);
+            var existingItem = await usersRepository.GetAsync(data.Id);
             existingItem.Name = data.Name;
             existingItem.Email = data.Email;
             
-            await _usersRepository.UpdateAsync(existingItem);
+            await usersRepository.UpdateAsync(existingItem);
 
             return Ok();
         }
@@ -62,8 +55,8 @@ namespace ICAP_AccountService.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(string id)
         {
-            var existingItem = await _usersRepository.GetAsync(id);
-            await _usersRepository.RemoveAsync(existingItem.Id);
+            var existingItem = await usersRepository.GetAsync(id);
+            await usersRepository.RemoveAsync(existingItem.Id);
             return Ok();
         }
     }
