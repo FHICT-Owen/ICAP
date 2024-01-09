@@ -11,7 +11,9 @@
         <MudSpacer />
         <AuthorizeView>
             <Authorized>
-            <MudText Typo="Typo.body1">Welcome, @context.User.Identity?.Name</MudText>
+                <a href="User">
+                    <MudText Class="px-4 d-none d-sm-flex" Typo="Typo.body1" Style="color:white">Welcome, @context.User.Identity?.Name</MudText>
+                </a>
                 <MudButton OnClick="LogOut" Variant="Variant.Filled" Color="Color.Error">Log Out</MudButton>
             </Authorized>
             <NotAuthorized>

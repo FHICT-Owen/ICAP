@@ -13,10 +13,7 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(builder.Configuration);
 
-builder.Services.AddControllers(options =>
-{
-    options.SuppressAsyncSuffixInActionNames = true;
-});
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
