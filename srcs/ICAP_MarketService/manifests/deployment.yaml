@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: icap-marketservice-deployment
+  name: icap-marketservice
   labels:
     app: icap-marketservice
   namespace: default

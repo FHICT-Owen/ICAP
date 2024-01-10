@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: icap-relationservice-deployment
+  name: icap-relationservice
   labels:
     app: icap-relationservice
   namespace: default
