@@ -8,11 +8,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: icap-relationservice-deployment
+      app: icap-relationservice
   template:
     metadata:
       labels:
-        app: icap-relationservice-deployment
+        app: icap-relationservice
     spec:
       containers:
         - name: icap-relationservice

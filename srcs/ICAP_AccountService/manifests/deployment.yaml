@@ -8,11 +8,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: icap-accountservice-deployment
+      app: icap-accountservice
   template:
     metadata:
       labels:
-        app: icap-accountservice-deployment
+        app: icap-accountservice
     spec:
       containers:
         - name: icap-accountservice
