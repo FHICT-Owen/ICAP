@@ -9,4 +9,4 @@ spec:
     app: icap-relationservice
   ports:
     - port: 5000
-      targetport: 5000
+      targetPort: 5000
