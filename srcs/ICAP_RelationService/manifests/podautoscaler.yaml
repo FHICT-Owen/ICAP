@@ -8,5 +8,5 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: icap-relationservice
+    name: icap-relationservice-deployment
   targetCPUUtilizationPercentage: 50

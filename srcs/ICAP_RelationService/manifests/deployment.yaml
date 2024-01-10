@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: icap-relationservice
+  name: icap-relationservice-deployment
   labels:
-    app: icap-relationservice
+    app: icap-relationservice-deployment
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: icap-relationservice
+      app: icap-relationservice-deployment
   template:
     metadata:
       labels:
-        app: icap-relationservice
+        app: icap-relationservice-deployment
     spec:
       containers:
         - name: icap-relationservice
