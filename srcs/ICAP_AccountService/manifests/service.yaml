@@ -8,5 +8,6 @@ spec:
   selector:
     app: icap-accountservice
   ports:
-    - port: 5000
-      targetPort: 5000
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000

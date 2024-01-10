@@ -15,18 +15,18 @@ spec:
         app: icap-accountservice
     spec:
       containers:
-        - name: icap-accountservice
-          image: icapacr.azurecr.io/icap-accountservice:latest
-          ports:
-            - containerPort: 5000
-          volumeMounts:
-            - name: secrets-store-accountservice
-              mountPath: "/mnt/secrets-store"
-              readOnly: true
-      volumes:
+      - name: icap-accountservice
+        image: icapacr.azurecr.io/icap-accountservice:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
         - name: secrets-store-accountservice
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: "icap-accountservice-kv"
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      volumes:
+      - name: secrets-store-accountservice
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "icap-accountservice-kv"

@@ -15,18 +15,18 @@ spec:
         app: icap-relationservice
     spec:
       containers:
-        - name: icap-relationservice
-          image: icapacr.azurecr.io/icap-relationservice:latest
-          ports:
-            - containerPort: 5000
-          volumeMounts:
-            - name: secrets-store-relationservice
-              mountPath: "/mnt/secrets-store"
-              readOnly: true
-      volumes:
+      - name: icap-relationservice
+        image: icapacr.azurecr.io/icap-relationservice:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
         - name: secrets-store-relationservice
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: "icap-relationservice-kv"
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      volumes:
+      - name: secrets-store-relationservice
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "icap-relationservice-kv"
