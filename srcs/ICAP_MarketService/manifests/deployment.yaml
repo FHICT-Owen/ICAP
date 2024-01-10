@@ -6,6 +6,9 @@ metadata:
     app: icap-marketservice-deployment
   namespace: default
 spec:
+  selector:
+    matchLabels:
+      app: icap-marketservice-deployment
   template:
     metadata:
       labels:

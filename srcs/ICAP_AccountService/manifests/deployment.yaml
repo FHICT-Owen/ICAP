@@ -6,6 +6,9 @@ metadata:
     app: icap-accountservice-deployment
   namespace: default
 spec:
+  selector:
+    matchLabels:
+      app: icap-accountservice-deployment
   template:
     metadata:
       labels:
