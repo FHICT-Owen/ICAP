@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: icap-accountservice-deployment
+  name: icap-accountservice
   labels:
-    app: icap-accountservice-deployment
+    app: icap-accountservice
   namespace: default
 spec:
   replicas: 1
