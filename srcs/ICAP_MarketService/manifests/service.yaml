@@ -6,6 +6,6 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: icap-marketservice
+    app: icap-marketservice-deployment
   ports:
     - port: 80

@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   annotations:
     kubernetes.azure.com/tls-cert-keyvault-uri: https://icap-vault.vault.azure.net/certificates/ICAP-AKS-CERT/687ed42192e443cdaa9635d5ab67a960    
-  name: icap-marketservice
+  name: icap-marketservice-ingress
   namespace: default
 spec:
   ingressClassName: webapprouting.kubernetes.azure.com

@@ -6,6 +6,6 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: icap-relationservice
+    app: icap-relationservice-deployment
   ports:
     - port: 80
