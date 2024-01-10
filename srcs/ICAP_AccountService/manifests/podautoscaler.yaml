@@ -8,5 +8,5 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: icap-accountservice-deployment
+    name: icap-accountservice
   targetCPUUtilizationPercentage: 50
