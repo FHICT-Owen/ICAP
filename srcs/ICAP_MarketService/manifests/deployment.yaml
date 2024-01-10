@@ -18,7 +18,7 @@ spec:
         - name: icap-marketservice
           image: icapacr.azurecr.io/icap-marketservice:latest
           ports:
-            - containerPort: 80
+            - containerPort: 5000
           volumeMounts:
             - name: secrets-store-marketservice
               mountPath: "/mnt/secrets-store"

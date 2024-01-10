@@ -18,7 +18,7 @@ spec:
         - name: icap-relationservice
           image: icapacr.azurecr.io/icap-relationservice:latest
           ports:
-            - containerPort: 80
+            - containerPort: 5000
           volumeMounts:
             - name: secrets-store-relationservice
               mountPath: "/mnt/secrets-store"

@@ -18,7 +18,7 @@ spec:
         - name: icap-accountservice
           image: icapacr.azurecr.io/icap-accountservice:latest
           ports:
-            - containerPort: 80
+            - containerPort: 5000
           volumeMounts:
             - name: secrets-store-accountservice
               mountPath: "/mnt/secrets-store"
