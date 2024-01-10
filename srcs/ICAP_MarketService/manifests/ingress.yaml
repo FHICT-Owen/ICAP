@@ -8,8 +8,8 @@ metadata:
 spec:
   ingressClassName: webapprouting.kubernetes.azure.com
   rules:
-  - http:
-    host: aks.odb-tech.com
+  - host: aks.odb-tech.com
+    http:
       paths:
       - path: /market
         pathType: Prefix
@@ -19,5 +19,6 @@ spec:
             port: 
               number: 80
   tls:
-  - hosts: aks.odb-tech.com
+  - hosts: 
+    - aks.odb-tech.com
     secretName: keyvault-icap-marketservice

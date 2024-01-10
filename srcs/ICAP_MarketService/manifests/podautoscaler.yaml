@@ -9,4 +9,4 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: icap-marketservice
-    metrics: 50 # target CPU utilization
+  targetCPUUtilizationPercentage: 50
