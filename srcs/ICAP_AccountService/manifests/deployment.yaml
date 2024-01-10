@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: icap-accountservice-deployment
   labels:
-    app: icap-accountservice-deployment
+    app: icap-accountservice
   namespace: default
 spec:
   selector:

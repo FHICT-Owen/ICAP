@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: icap-relationservice-deployment
   labels:
-    app: icap-relationservice-deployment
+    app: icap-relationservice
   namespace: default
 spec:
   selector:

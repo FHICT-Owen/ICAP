@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: icap-marketservice-deployment
   labels:
-    app: icap-marketservice-deployment
+    app: icap-marketservice
   namespace: default
 spec:
   selector:
