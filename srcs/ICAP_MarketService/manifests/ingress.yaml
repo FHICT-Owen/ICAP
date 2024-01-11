@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   annotations:
     kubernetes.azure.com/tls-cert-keyvault-uri: https://icap-vault.vault.azure.net/certificates/ICAP-AKS-CERT/687ed42192e443cdaa9635d5ab67a960    
+    nginx.ingress.kubernetes.io/rewrite-target: /
   name: icap-marketservice-ingress
   namespace: default
 spec:
@@ -18,3 +19,7 @@ spec:
             name: icap-marketservice
             port: 
               number: 5000
+  tls:
+  - hosts: 
+    - aks.odb-tech.com
+    secretName: icap-marketservice

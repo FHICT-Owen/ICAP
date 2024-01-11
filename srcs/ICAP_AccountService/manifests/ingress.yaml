@@ -1,6 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    kubernetes.azure.com/tls-cert-keyvault-uri: https://icap-vault.vault.azure.net/certificates/ICAP-AKS-CERT/687ed42192e443cdaa9635d5ab67a960    
+    nginx.ingress.kubernetes.io/rewrite-target: /
   name: icap-accountservice-ingress
   namespace: default
 spec:
@@ -16,4 +19,8 @@ spec:
             name: icap-accountservice
             port: 
               number: 5000
+  tls:
+  - hosts: 
+    - aks.odb-tech.com
+    secretName: icap-accountservice
   
