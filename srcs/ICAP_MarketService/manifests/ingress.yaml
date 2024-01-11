@@ -2,8 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubernetes.azure.com/tls-cert-keyvault-uri: https://icap-vault.vault.azure.net/certificates/ICAP-AKS-CERT/687ed42192e443cdaa9635d5ab67a960    
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    kubernetes.azure.com/tls-cert-keyvault-uri: https://icap-vault.vault.azure.net/certificates/ICAP-AKS-CERT/3e368554caf94ef9a46ac10178733a86  
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
   name: icap-marketservice-ingress
   namespace: default
 spec:
@@ -12,7 +12,7 @@ spec:
   - host: aks.odb-tech.com
     http:
       paths:
-      - path: /market
+      - path: /market/(.*)
         pathType: Prefix
         backend:
           service:
