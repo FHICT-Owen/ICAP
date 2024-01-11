@@ -18,7 +18,3 @@ spec:
             name: icap-marketservice
             port: 
               number: 5000
-  tls:
-  - hosts: 
-    - aks.odb-tech.com
-    secretName: icap-marketservice
