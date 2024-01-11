@@ -22,5 +22,5 @@ spec:
   tls:
   - hosts: 
     - aks.odb-tech.com
-    secretName: icap-accountservice
+    secretName: keyvault-icap-accountservice-ingress
   
