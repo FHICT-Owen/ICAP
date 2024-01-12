@@ -84,6 +84,8 @@ Maintaining system scalability and performance with an increase in user load is 
 
 In conclusion, ensuring scalability and performance in real-time messaging for an enterprise application like ICAP requires a strategic blend of microservices architecture, load balancing with elastic scalability, and asynchronous processing with queue systems. Adopting a microservices based architecture provides the flexibility needed for scaling individual components in response to user load. Load balancing and elastic scalability ensure efficient distribution and dynamic adjustment of resources, while asynchronous processing and message queues like RabbitMQ or Kafka optimize the handling of data flow. These integrated approaches are key to maintaining robust, scalable, and efficient real-time messaging capabilities in a rapidly evolving enterprise environment.
 
+<div style="page-break-after: always;"></div>
+
 ### What kind of additional technologies are needed to achieve near real-time messaging?
 Given ICAP's developer's choice of C# as the primary programming language, it's crucial to integrate technologies and frameworks that are compatible and can leverage the strengths of C#. The goal is to achieve near real-time messaging while ensuring scalability, performance, and reliability. The following technologies and approaches are recommended:
 
@@ -94,6 +96,8 @@ Given ICAP's developer's choice of C# as the primary programming language, it's 
 3. **WebSocket Protocol**: For real-time bidirectional communication between the client and server, WebSockets should be utilized. This protocol is supported in .NET and provides a persistent connection between client and server, allowing for immediate data transfer.
 
 In conclusion, a combination of these technologies, aligned with C#'s capabilities and the enterprise’s infrastructure, can help ICAP achieve its goal of implementing near real-time messaging. It's essential to ensure that these technologies are integrated in a way that complements each other to create a robust, scalable, and efficient real-time messaging system.
+
+<div style="page-break-after: always;"></div>
 
 ## Conclusion
 For ICAP to achieve and maintain the ability to facilitate real-time messaging for possibly millions of users it will be important to use the previously found and mentioned system design paradigms and technologies to achieve the goal. This combination of paradigms and choices will be further expanded on and tested throughout the development and integration of real-time messaging for ICAP.
