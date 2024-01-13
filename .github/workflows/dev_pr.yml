@@ -95,9 +95,9 @@ jobs:
         services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
       - uses: actions/checkout@v4
-        if: needs.filter.outputs['ICAP_Client'] == 'true'
+        if: needs.filter.outputs.ICAP_Client == 'true'
       - uses: azure/login@v1
-        if: needs.filter.outputs['ICAP_Client'] == 'true'
+        if: needs.filter.outputs.ICAP_Client == 'true'
         name: Azure login
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
