@@ -95,9 +95,9 @@ jobs:
         services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
       - uses: actions/checkout@v4
-        if: needs.filter.outputs.ICAP_Client == 'true'
+        if: needs.filter.outputs[matrix.services] == 'true'
       - uses: azure/login@v1
-        if: needs.filter.outputs.ICAP_Client == 'true'
+        if: needs.filter.outputs[matrix.services] == 'true'
         name: Azure login
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -113,12 +113,12 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
     - uses: actions/checkout@v4
-      if: needs.filter.outputs[matrix.services] == 'true'
+      if: needs.filter.outputs.ICAP_Client == 'true'
       with:
         submodules: true
         lfs: false
     - name: Build And Deploy
-      if: needs.filter.outputs[matrix.services] == 'true'
+      if: needs.filter.outputs.ICAP_Client == 'true'
       id: builddeploy
       uses: Azure/static-web-apps-deploy@v1
       with:
