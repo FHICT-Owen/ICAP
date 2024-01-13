@@ -1,8 +1,12 @@
 ﻿using ICAP_AccountService.Entities;
 using ICAP_Infrastructure.Repositories;
+using ICAP_ServiceBus;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace ICAP_AccountService.Controllers
 {
@@ -10,61 +14,92 @@ namespace ICAP_AccountService.Controllers
     [RequiredScope("access_as_user")]
     [ApiController]
     [Route("users")]
-    public class UsersController : ControllerBase
+    public class UsersController(IRepository<User> usersRepository, IBusPublisher busPublisher) : ControllerBase
     {
-        private readonly IRepository<User> _usersRepository;
-
-        public UsersController(IRepository<User> usersRepository)
-        {
-            _usersRepository = usersRepository;
-        }
-
         [HttpGet]
         public async Task<IEnumerable<User>> GetAsync()
         {
-            var items = await _usersRepository.GetAllAsync();
+            var items = await usersRepository.GetAllAsync();
             return items;
         }
 
-        [HttpPost("{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetByIdAsync(string id)
         {
-            var item = await _usersRepository.GetAsync(id);
+            var item = await usersRepository.GetAsync(id);
             return item;
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> PostAsync(User data)
+        public async Task<ActionResult<User>> PostAsync()
         {
+            var authorizationHeader = Request.Headers.Authorization.ToString();
+            if (authorizationHeader.IsNullOrEmpty()) return BadRequest();
+            var decodedToken = GetTokenFromAuthHeader(authorizationHeader);
+
+            var id = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
+            var name = decodedToken.Claims.First(claim => claim.Type == "name").Value;
+            var email = decodedToken.Claims.First(claim => claim.Type == "email").Value;
+
             var request = new User
             {
-                Name = data.Name,
-                Email = data.Email,
+                Id = id,
+                Name = name,
+                Email = email,
                 CreatedDateTime = DateTimeOffset.Now
             };
+            var userResult = await usersRepository.GetAllAsync(user => user.Email == request.Email);
+            if (userResult.Count > 0) return Conflict("User with this email already exists.");
 
-            await _usersRepository.CreateAsync(request);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = request.Id }, request);
+            await usersRepository.CreateAsync(request);
+            return Created(Request.Path, request);
         }
 
         [HttpPut]
         public async Task<IActionResult> PutAsync(User data)
         {
-            var existingItem = await _usersRepository.GetAsync(data.Id);
+            var existingItem = await usersRepository.GetAsync(data.Id);
             existingItem.Name = data.Name;
             existingItem.Email = data.Email;
             
-            await _usersRepository.UpdateAsync(existingItem);
+            await usersRepository.UpdateAsync(existingItem);
 
             return Ok();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(string id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAsync()
         {
-            var existingItem = await _usersRepository.GetAsync(id);
-            await _usersRepository.RemoveAsync(existingItem.Id);
+            var authorizationHeader = Request.Headers.Authorization.ToString();
+            if (authorizationHeader.IsNullOrEmpty()) return BadRequest();
+            var oid = GetOidFromToken(authorizationHeader);
+            if (oid == null) return BadRequest("Unable to get OID from token");
+
+            await busPublisher.SendMessageAsync(oid, "DeleteUserData");
+            var existingItem = await usersRepository.GetAsync(oid);
+            if (existingItem == null) return NotFound("User was not found");
+            await usersRepository.RemoveAsync(existingItem.Id);
             return Ok();
+        }
+
+        private string? GetOidFromToken(string authorizationHeader)
+        {
+            if (string.IsNullOrWhiteSpace(authorizationHeader) || !authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+            var token = authorizationHeader["Bearer ".Length..].Trim();
+            var jwtHandler = new JwtSecurityTokenHandler();
+            var decodedToken = jwtHandler.ReadJwtToken(token);
+            var oidClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+            return oidClaim?.Value;
+        }
+
+        private JwtSecurityToken GetTokenFromAuthHeader(string authorizationHeader)
+        {
+            var token = authorizationHeader["Bearer ".Length..].Trim();
+            var jwtHandler = new JwtSecurityTokenHandler();
+            return jwtHandler.ReadJwtToken(token);
         }
     }
 }

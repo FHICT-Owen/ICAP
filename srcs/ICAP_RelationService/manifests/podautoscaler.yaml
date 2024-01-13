@@ -1,0 +1,12 @@
+﻿apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: icap-relationservice-hpa
+spec:
+  maxReplicas: 15
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: icap-relationservice
+  targetCPUUtilizationPercentage: 50

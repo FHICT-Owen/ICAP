@@ -4,18 +4,11 @@ using Azure.Messaging.ServiceBus;
 
 namespace ICAP_ServiceBus
 {
-    public class BusPublisher : IBusPublisher
+    public class BusPublisher(string connectionString) : IBusPublisher
     {
-        private readonly string _connectionString;
-
-        public BusPublisher(string connectionString)
-        {
-            _connectionString = connectionString;
-        }
-
         public async Task SendMessageAsync<T>(T serviceBusMessage, string topicName)
         {
-            var client = new ServiceBusClient(_connectionString, new ServiceBusClientOptions
+            var client = new ServiceBusClient(connectionString, new ServiceBusClientOptions
             {
                 ConnectionIdleTimeout = TimeSpan.FromMinutes(5),
             });

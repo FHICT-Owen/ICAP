@@ -6,7 +6,6 @@ metadata:
     app: icap-marketservice
   namespace: default
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: icap-marketservice
@@ -16,18 +15,18 @@ spec:
         app: icap-marketservice
     spec:
       containers:
-        - name: icap-marketservice
-          image: icapacr.azurecr.io/icap-marketservice:latest
-          ports:
-            - containerPort: 80
-          volumeMounts:
-            - name: secrets-store-marketservice
-              mountPath: "/mnt/secrets-store"
-              readOnly: true
-      volumes:
+      - name: icap-marketservice
+        image: icapacr.azurecr.io/icap-marketservice:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
         - name: secrets-store-marketservice
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: "icap-marketservice-kv"
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      volumes:
+      - name: secrets-store-marketservice
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "icap-marketservice-kv"

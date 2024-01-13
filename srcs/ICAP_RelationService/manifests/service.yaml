@@ -8,6 +8,6 @@ spec:
   selector:
     app: icap-relationservice
   ports:
-    - protocol: TCP
-      port: 5200
-      targetPort: 80
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000

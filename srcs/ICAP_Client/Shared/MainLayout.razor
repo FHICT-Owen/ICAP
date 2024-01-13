@@ -1,5 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using ICAP_Client.RESTClients
+@inherits LayoutComponentBase
 @inject NavigationManager Navigation
+@inject IAccessTokenProvider AuthorizationService
+@inject AccountServiceClient AccountServiceClient
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -11,7 +14,9 @@
         <MudSpacer />
         <AuthorizeView>
             <Authorized>
-            <MudText Typo="Typo.body1">Welcome, @context.User.Identity?.Name</MudText>
+                <a href="User">
+                    <MudText Class="px-4 d-none d-sm-flex" Typo="Typo.body1" Style="color:white">Welcome, @context.User.Identity?.Name</MudText>
+                </a>
                 <MudButton OnClick="LogOut" Variant="Variant.Filled" Color="Color.Error">Log Out</MudButton>
             </Authorized>
             <NotAuthorized>
@@ -40,5 +45,18 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var tokenResult = await AuthorizationService.RequestAccessToken();
+        if (tokenResult.Status != AccessTokenResultStatus.Success) return;
+        if (!tokenResult.TryGetToken(out var token))
+        {
+            throw new InvalidOperationException(
+                "Failed to provision the access token.");
+        }
+
+        await AccountServiceClient.SendTokenAsync(token.Value);
     }
 }

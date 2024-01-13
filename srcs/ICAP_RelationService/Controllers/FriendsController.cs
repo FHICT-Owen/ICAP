@@ -36,7 +36,7 @@ namespace ICAP_RelationService.Controllers
             };
 
             await friendsRepository.CreateAsync(request);
-            return CreatedAtRoute(nameof(GetByIdAsync), new { id = request.Id }, request);
+            return Created(Request.Path, data);
         }
 
         [HttpPut("{id}")]

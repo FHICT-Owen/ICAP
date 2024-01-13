@@ -2,11 +2,15 @@
 @attribute [Authorize]
 @using System.Text.Json
 @using System.Security.Claims
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using ICAP_Client.RESTClients
 @inject IAccessTokenProvider AuthorizationService
+@inject AccountServiceClient AccountServiceClient
+@inject ISnackbar Snackbar
 
 <h1>@AuthenticatedUser?.Identity?.Name</h1>
+
+<h3>Would you like to remove your account and all accompanying data?</h3>
+<MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="DeleteData">Delete</MudButton>
 
 <h2>Claims</h2>
 
@@ -46,7 +50,7 @@
     private Task<AuthenticationState> AuthenticationState { get; set; }
 
     public ClaimsPrincipal AuthenticatedUser { get; set; }
-    public AccessToken AccessToken { get; set; }
+    public AccessToken? AccessToken { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,7 +69,7 @@
         AuthenticatedUser = state.User;
     }
 
-    protected IDictionary<string, object> GetAccessTokenClaims()
+    protected IDictionary<string, object>? GetAccessTokenClaims()
     {
         if (AccessToken == null)
         {
@@ -79,5 +83,15 @@
 
         return JsonSerializer.Deserialize<IDictionary<string, object>>(
             Convert.FromBase64String(base64Payload));
+    }
+
+    private async Task DeleteData()
+    {
+        if (AccessToken == null)
+        {
+            Snackbar.Add("Unable to delete data, access token is not set!", Severity.Error);
+            return;
+        }
+        await AccountServiceClient.RemoveUserDataAsync(AccessToken.Value);
     }
 }
