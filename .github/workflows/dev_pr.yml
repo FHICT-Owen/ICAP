@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService, ICAP_ServiceBus]
+        services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
     - uses: actions/checkout@v4
       if: needs.filter.outputs[matrix.services] == 'true'
