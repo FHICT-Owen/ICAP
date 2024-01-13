@@ -46,31 +46,29 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService, ICAP_ServiceBus]
+        services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
-    - name: See filter output
-      run: echo "The value is ${{ needs.filter.outputs[matrix.services] }}"
     - uses: actions/checkout@v4
-      if: needs.filter.outputs[matrix.services]
+      if: needs.filter.outputs[matrix.services] == 'true'
     - name: Setup .NET Core
-      if: needs.filter.outputs[matrix.services]
+      if: needs.filter.outputs[matrix.services] == 'true'
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
     - name: Build
-      if: needs.filter.outputs[matrix.services]
+      if: needs.filter.outputs[matrix.services] == 'true'
       run: |
         cd ./srcs/${{ matrix.services }}
         dotnet build $(ls *.csproj)
 
     - name: SpecFlow Tests
-      if: needs.filter.outputs[matrix.services]
+      if: needs.filter.outputs[matrix.services] == 'true'
       run: |
         cd ./srcs/${{ matrix.services }}.Specs
         dotnet test --no-build $(ls *.csproj)
 
     - name: SonarCloud Scan
-      if: needs.filter.outputs[matrix.services]
+      if: needs.filter.outputs[matrix.services] == 'true'
       uses: highbyte/sonarscan-dotnet@v2.3.0
       with:
         # The key of the SonarQube project
@@ -95,21 +93,42 @@ jobs:
       matrix:
         services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
-        - uses: actions/checkout@v4
-          if: needs.filter.outputs[matrix.services]
-        - uses: azure/login@v1
-          if: needs.filter.outputs[matrix.services]
-          name: Azure login
-          with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
-        - name: Create ENV for name container image
-          run: |
-            echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
-        - name: Build and push image to ACR
-          if: needs.filter.outputs[matrix.services]
-          run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
+      - uses: actions/checkout@v4
+        if: needs.filter.outputs[matrix.services] == 'true'
+      - uses: azure/login@v1
+        if: needs.filter.outputs[matrix.services] == 'true'
+        name: Azure login
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Create ENV for name container image
+        run: |
+          echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
+      - name: Build and push image to ACR
+        if: needs.filter.outputs[matrix.services] == 'true'
+        run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
+  
+  deploy-client:
+    needs: [filter, build-and-test]
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v4
+      if: needs.filter.outputs.ICAP_Client == 'true'
+      with:
+        submodules: true
+        lfs: false
+    - name: Build And Deploy
+      if: needs.filter.outputs.ICAP_Client == 'true'
+      id: builddeploy
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AMBITIOUS_OCEAN_0C5E26903  }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "/srcs/ICAP_Client"
+        api_location: ""
+        output_location: "wwwroot"
 
-  deploy: 
+  deploy-services: 
     needs: [filter, build-image]
     permissions:
       actions: read
@@ -120,22 +139,20 @@ jobs:
       matrix:
         services: [ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
-      - name: See filter output
-        run: echo "The value is ${{ needs.filter.outputs[matrix.services] }}"
       - uses: actions/checkout@v4
-        if: needs.filter.outputs[matrix.services]
+        if: needs.filter.outputs[matrix.services] == 'true'
       - uses: azure/login@v1
-        if: needs.filter.outputs[matrix.services]
+        if: needs.filter.outputs[matrix.services] == 'true'
         name: Azure login
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - uses: azure/use-kubelogin@v1
-        if: needs.filter.outputs[matrix.services]
+        if: needs.filter.outputs[matrix.services] == 'true'
         name: Set up kubelogin for non-interactive login
         with:
           kubelogin-version: v0.0.25
       - uses: azure/aks-set-context@v3
-        if: needs.filter.outputs[matrix.services]
+        if: needs.filter.outputs[matrix.services] == 'true'
         name: Get K8s context
         with:
           admin: "false"
@@ -146,7 +163,7 @@ jobs:
         run: |
           echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
       - uses: Azure/k8s-deploy@v4
-        if: needs.filter.outputs[matrix.services]
+        if: needs.filter.outputs[matrix.services] == 'true'
         name: Deploys application
         with:
           action: deploy
@@ -154,6 +171,7 @@ jobs:
           manifests: |
             ./srcs/${{ matrix.services }}/manifests/deployment.yaml
             ./srcs/${{ matrix.services }}/manifests/service.yaml
+            ./srcs/${{ matrix.services }}/manifests/podautoscaler.yaml
             ./srcs/${{ matrix.services }}/manifests/ingress.yaml
             ./srcs/${{ matrix.services }}/manifests/secretprovider.yaml
           namespace: default
