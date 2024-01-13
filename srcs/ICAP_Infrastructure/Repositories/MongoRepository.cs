@@ -4,15 +4,11 @@ using MongoDB.Driver;
 
 namespace ICAP_Infrastructure.Repositories
 {
-    public class MongoRepository<T> : IRepository<T> where T : IEntity
+    public class MongoRepository<T>(IMongoDatabase database, string collectionName) : IRepository<T>
+        where T : IEntity
     {
-        private readonly IMongoCollection<T> _dbCollection;
+        private readonly IMongoCollection<T> _dbCollection = database.GetCollection<T>(collectionName);
         private readonly FilterDefinitionBuilder<T> _filterBuilder = Builders<T>.Filter;
-
-        public MongoRepository(IMongoDatabase database, string collectionName)
-        {
-            _dbCollection = database.GetCollection<T>(collectionName);
-        }
 
         public async Task<IReadOnlyCollection<T>> GetAllAsync()
         {
@@ -38,7 +34,7 @@ namespace ICAP_Infrastructure.Repositories
         public async Task CreateAsync(T entity)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            if (entity.Id == "") entity.Id = Guid.NewGuid().ToString();
+            if (string.IsNullOrEmpty(entity.Id)) entity.Id = Guid.NewGuid().ToString();
             await _dbCollection.InsertOneAsync(entity);
         }
 

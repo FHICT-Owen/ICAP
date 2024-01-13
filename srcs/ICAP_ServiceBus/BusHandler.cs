@@ -4,13 +4,9 @@ using Azure.Messaging.ServiceBus;
 
 namespace ICAP_ServiceBus
 {
-    public class BusHandler : IBusHandler
+    public class BusHandler(string connectionString) : IBusHandler
     {
-        private readonly ServiceBusClient _client;
-        public BusHandler(string connectionString)
-        {
-            _client = new ServiceBusClient(connectionString);
-        }
+        private readonly ServiceBusClient _client = new(connectionString);
 
         public async Task CreateBusHandler<T>(string topicName, string subscriptionName, Func<T, Task> onMessageProcessed)
         {

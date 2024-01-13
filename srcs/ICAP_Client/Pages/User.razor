@@ -2,7 +2,10 @@
 @attribute [Authorize]
 @using System.Text.Json
 @using System.Security.Claims
+@using ICAP_Client.RESTClients
 @inject IAccessTokenProvider AuthorizationService
+@inject AccountServiceClient AccountServiceClient
+@inject ISnackbar Snackbar
 
 <h1>@AuthenticatedUser?.Identity?.Name</h1>
 
@@ -66,7 +69,7 @@
         AuthenticatedUser = state.User;
     }
 
-    protected IDictionary<string, object> GetAccessTokenClaims()
+    protected IDictionary<string, object>? GetAccessTokenClaims()
     {
         if (AccessToken == null)
         {
@@ -84,6 +87,11 @@
 
     private async Task DeleteData()
     {
-
+        if (AccessToken == null)
+        {
+            Snackbar.Add("Unable to delete data, access token is not set!", Severity.Error);
+            return;
+        }
+        await AccountServiceClient.RemoveUserDataAsync(AccessToken.Value);
     }
 }
