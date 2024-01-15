@@ -8,16 +8,20 @@ using Microsoft.Identity.Web;
 var builder = WebApplication.CreateBuilder(args);
 
 const string secretPath = "/mnt/secrets-store";
-var secretFiles = Directory.GetFiles(secretPath) ?? null;
-if (secretFiles != null)
+try
 {
-    foreach (var file in secretFiles)
+    var secretFiles = Directory.GetFiles(secretPath);
+    if (secretFiles.Any())
     {
-        var secretName = Path.GetFileName(file);
-        var secretValue = File.ReadAllText(file);
-        Environment.SetEnvironmentVariable(secretName, secretValue);
+        foreach (var file in secretFiles)
+        {
+            var secretName = Path.GetFileName(file);
+            var secretValue = File.ReadAllText(file);
+            Environment.SetEnvironmentVariable(secretName, secretValue);
+        }
     }
-} 
+} catch (Exception) { }
+
 
 builder.Configuration.AddEnvironmentVariables();
 
