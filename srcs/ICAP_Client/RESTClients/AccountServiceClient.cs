@@ -13,11 +13,12 @@ namespace ICAP_Client.RESTClients
             httpClient.DefaultRequestHeaders.Authorization = null;
         }
 
-        public async Task RemoveUserDataAsync(string token)
+        public async Task<bool> RemoveUserDataAsync(string token)
         {
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            await httpClient.DeleteAsync($"{_serverUrl}/accounts/users");
+            var response = await httpClient.DeleteAsync($"{_serverUrl}/accounts/users");
             httpClient.DefaultRequestHeaders.Authorization = null;
+            return response.IsSuccessStatusCode;
         }
     }
 }

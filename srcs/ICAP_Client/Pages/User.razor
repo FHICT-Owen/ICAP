@@ -92,6 +92,8 @@
             Snackbar.Add("Unable to delete data, access token is not set!", Severity.Error);
             return;
         }
-        await AccountServiceClient.RemoveUserDataAsync(AccessToken.Value);
+        var result = await AccountServiceClient.RemoveUserDataAsync(AccessToken.Value);
+        if (result) Snackbar.Add("Removed user data successfully! You can log out now.", Severity.Success);
+        else Snackbar.Add("Unable to delete data, account service returned an error", Severity.Error);
     }
 }
