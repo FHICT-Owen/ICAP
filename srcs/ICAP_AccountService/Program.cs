@@ -1,6 +1,7 @@
 using System.Reflection;
 using ICAP_AccountService.Entities;
 using ICAP_AccountService.Events;
+using ICAP_Infrastructure;
 using ICAP_Infrastructure.Repositories;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -42,7 +43,10 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    if (!builder.Environment.IsDevelopment()) c.DocumentFilter<BasePathFilter>("/accounts");
+});
 
 builder.Services.AddMassTransit(x =>
 {

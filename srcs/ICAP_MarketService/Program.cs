@@ -1,9 +1,10 @@
+using ICAP_Infrastructure;
+using ICAP_Infrastructure.Repositories;
+using ICAP_MarketService.Entities;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
-using System.Reflection;
-using ICAP_Infrastructure.Repositories;
-using ICAP_MarketService.Entities;
+using Swashbuckle.AspNetCore.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +42,10 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    if (!builder.Environment.IsDevelopment()) c.DocumentFilter<BasePathFilter>("/listings");
+});
 
 builder.Services.AddMassTransit(x =>
 {

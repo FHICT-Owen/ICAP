@@ -1,3 +1,4 @@
+using ICAP_Infrastructure;
 using ICAP_Infrastructure.Repositories;
 using ICAP_RelationService.Entities;
 using ICAP_RelationService.Events;
@@ -42,7 +43,10 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    if (!builder.Environment.IsDevelopment()) c.DocumentFilter<BasePathFilter>("/relations");
+});
 
 builder.Services.AddMassTransit(x =>
 {
