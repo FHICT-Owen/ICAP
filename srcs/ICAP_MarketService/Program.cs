@@ -27,7 +27,6 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowedSpecificOrigins", builder =>
         builder.WithOrigins("http://localhost",
                             "https://localhost",
-                            "http://icap.odb-tech.com",
                             "https://icap.odb-tech.com")
                .AllowAnyMethod()
                .AllowAnyHeader());
