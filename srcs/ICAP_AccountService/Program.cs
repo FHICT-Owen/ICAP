@@ -7,6 +7,18 @@ using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string secretPath = "/mnt/secrets-store";
+var secretFiles = Directory.GetFiles(secretPath);
+if (secretFiles.Any())
+{
+    foreach (var file in secretFiles)
+    {
+        var secretName = Path.GetFileName(file);
+        var secretValue = File.ReadAllText(file);
+        Environment.SetEnvironmentVariable(secretName, secretValue);
+    }
+} 
+
 builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
