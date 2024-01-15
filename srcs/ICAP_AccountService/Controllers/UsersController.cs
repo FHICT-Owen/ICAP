@@ -76,11 +76,14 @@ namespace ICAP_AccountService.Controllers
             return Ok();
         }
 
+        public record DeleteUserData(string UserId);
+
         [Authorize]
         [RequiredScope("access_as_user")]
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync()
         {
+
             var authorizationHeader = Request.Headers.Authorization.ToString();
             if (authorizationHeader.IsNullOrEmpty()) return BadRequest();
             var decodedToken = GetTokenFromAuthHeader(authorizationHeader);
@@ -88,7 +91,7 @@ namespace ICAP_AccountService.Controllers
             if (oid.IsNullOrEmpty()) return BadRequest("Unable to get OID from token");
 
             var endpoint = await bus.GetSendEndpoint(new Uri("topic:deleteuserdata"));
-            await endpoint.Send(oid);
+            await endpoint.Send(new DeleteUserData(oid));
 
             var existingItem = await usersRepository.GetAsync(oid);
             if (existingItem == null) return NotFound("User was not found");
