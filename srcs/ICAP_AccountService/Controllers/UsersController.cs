@@ -9,13 +9,12 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace ICAP_AccountService.Controllers
 {
-    [Authorize]
-    [RequiredScope("access_as_user")]
     [ApiController]
     [Route("users")]
     public class UsersController(IRepository<User> usersRepository, IBus bus) : ControllerBase
     {
         public record UserDto(string Name, string Email);
+
         [HttpGet]
         public async Task<IEnumerable<User>> GetAsync()
         {
@@ -30,6 +29,8 @@ namespace ICAP_AccountService.Controllers
             return item;
         }
 
+        [Authorize]
+        [RequiredScope("access_as_user")]
         [HttpPost]
         public async Task<ActionResult<User>> PostAsync()
         {
@@ -55,6 +56,8 @@ namespace ICAP_AccountService.Controllers
             return Created(Request.Path, request);
         }
 
+        [Authorize]
+        [RequiredScope("access_as_user")]
         [HttpPut]
         public async Task<IActionResult> PutAsync(UserDto data)
         {
@@ -73,6 +76,8 @@ namespace ICAP_AccountService.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [RequiredScope("access_as_user")]
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync()
         {

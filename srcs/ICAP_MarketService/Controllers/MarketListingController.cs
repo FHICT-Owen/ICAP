@@ -8,8 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace ICAP_MarketService.Controllers
 {
-    [Authorize]
-    [RequiredScope("access_as_user")]
+    
     [ApiController]
     [Route("listings")]
     public class MarketListingController(IRepository<MarketListing> listingRepository) : ControllerBase
@@ -31,6 +30,8 @@ namespace ICAP_MarketService.Controllers
             return Ok(item);
         }
 
+        [Authorize]
+        [RequiredScope("access_as_user")]
         [HttpPost]
         public async Task<ActionResult<MarketListing>> AddAsync(MarketListingDto reqData)
         {
@@ -53,6 +54,8 @@ namespace ICAP_MarketService.Controllers
             return Created(Request.Path, data);
         }
 
+        [Authorize]
+        [RequiredScope("access_as_user")]
         [HttpPut("{id}")]
         public async Task<IActionResult> EditListingAsync(MarketListingDto reqData, string id)
         {
@@ -64,6 +67,8 @@ namespace ICAP_MarketService.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [RequiredScope("access_as_user")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveListingAsync(string id)
         {
