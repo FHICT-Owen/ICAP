@@ -56,8 +56,6 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddMongo()
     .AddMongoRepository<User>("users");
 
-builder.Services.AddSingleton<FriendRequestAccepted>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
