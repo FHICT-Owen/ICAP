@@ -10,7 +10,7 @@ app:
 
 # -- Customized Configuration for GraphQL/SOAP/OpenAPI, add here --
   openApiConf:
-    path: /relations/swagger # OR...
+    path: /relations/swagger/v1/swagger.json # OR...
 #     filePath: openApi.json
   autoPolicy: true
   autoInputVectors: true

@@ -44,7 +44,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    if (!builder.Environment.IsDevelopment()) c.DocumentFilter<BasePathFilter>("/listings");
+    if (!builder.Environment.IsDevelopment()) c.DocumentFilter<BasePathFilter>("/market");
 });
 
 builder.Services.AddMassTransit(x =>
