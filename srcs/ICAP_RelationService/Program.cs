@@ -68,10 +68,10 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowedSpecificOrigins");
+app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllers();
-app.UseCors("AllowedSpecificOrigins");
 
 app.Run();
