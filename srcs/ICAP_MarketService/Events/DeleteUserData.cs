@@ -5,11 +5,11 @@ using MassTransit;
 
 namespace ICAP_MarketService.Events
 {
-    public class DeleteUserDataEvent(IRepository<MarketListing> marketRepository) : IConsumer<DeleteUserData>
+    public class DeleteUserDataEvent(IRepository<MarketListing> marketRepository, ILogger<DeleteUserDataEvent> logger) : IConsumer<DeleteUserData>
     {
         public async Task Consume(ConsumeContext<DeleteUserData> ctx)
         {
-            Console.WriteLine($"Removing data for user {ctx.Message.UserId}");
+            logger.LogInformation($"Removing data for user {ctx.Message.UserId}");
             await marketRepository.RemoveAsync(item => item.UserId == ctx.Message.UserId);
         }
     }

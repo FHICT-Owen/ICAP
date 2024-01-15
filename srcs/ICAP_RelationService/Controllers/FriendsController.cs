@@ -9,7 +9,7 @@ namespace ICAP_RelationService.Controllers
     [Authorize]
     [RequiredScope("access_as_user")]
     [ApiController]
-    [Route("[controller]")]
+    [Route("friends")]
     public class FriendsController(IRepository<Friends> friendsRepository) : ControllerBase
     {
         [HttpGet]
