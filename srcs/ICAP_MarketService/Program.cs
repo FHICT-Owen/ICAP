@@ -5,8 +5,8 @@ using Microsoft.Identity.Web;
 var builder = WebApplication.CreateBuilder(args);
 
 const string secretPath = "/mnt/secrets-store";
-var secretFiles = Directory.GetFiles(secretPath);
-if (secretFiles.Any())
+var secretFiles = Directory.GetFiles(secretPath) ?? null;
+if (secretFiles != null)
 {
     foreach (var file in secretFiles)
     {
