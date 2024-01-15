@@ -26,8 +26,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DisableCORS", builder =>
-        builder.AllowAnyOrigin()
+    options.AddPolicy("AllowedSpecificOrigins", builder =>
+        builder.WithOrigins("http://localhost",
+                            "https://localhost",
+                            "http://icap.odb-tech.com",
+                            "https://icap.odb-tech.com")
                .AllowAnyMethod()
                .AllowAnyHeader());
 });
@@ -58,6 +61,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseCors("DisableCORS");
+app.UseCors("AllowedSpecificOrigins");
 
 app.Run();
