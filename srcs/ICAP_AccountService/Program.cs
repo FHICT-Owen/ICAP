@@ -25,6 +25,16 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowedSpecificOrigins", builder =>
+        builder.WithOrigins("http://localhost",
+                            "https://localhost",
+                            "https://icap.odb-tech.com")
+               .AllowAnyMethod()
+               .AllowAnyHeader());
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -52,5 +62,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseCors("AllowedSpecificOrigins");
 
 app.Run();

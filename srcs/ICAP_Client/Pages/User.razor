@@ -5,6 +5,7 @@
 @using ICAP_Client.RESTClients
 @inject IAccessTokenProvider AuthorizationService
 @inject AccountServiceClient AccountServiceClient
+@inject NavigationManager Navmanager
 @inject ISnackbar Snackbar
 
 <h1>@AuthenticatedUser?.Identity?.Name</h1>
@@ -93,7 +94,12 @@
             return;
         }
         var result = await AccountServiceClient.RemoveUserDataAsync(AccessToken.Value);
-        if (result) Snackbar.Add("Removed user data successfully! You can log out now.", Severity.Success);
+        if (result)
+        {
+            Snackbar.Add("Removed user data successfully! You will be logged out momentarily.", Severity.Success);
+            Thread.Sleep(5000);
+            Navmanager.NavigateToLogout("/authentication/logout", "/");
+        }
         else Snackbar.Add("Unable to delete data, account service returned an error", Severity.Error);
     }
 }
