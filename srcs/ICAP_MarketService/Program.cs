@@ -22,10 +22,15 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(builder.Configuration);
 
-builder.Services.AddControllers(options =>
+builder.Services.AddCors(options =>
 {
-    options.SuppressAsyncSuffixInActionNames = true;
+    options.AddPolicy("DisableCORS", builder =>
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader());
 });
+
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -47,5 +52,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseCors("DisableCORS");
 
 app.Run();

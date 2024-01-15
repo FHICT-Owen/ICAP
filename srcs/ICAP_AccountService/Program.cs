@@ -25,6 +25,14 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DisableCORS", builder =>
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader());
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -52,5 +60,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseCors("DisableCORS");
 
 app.Run();
