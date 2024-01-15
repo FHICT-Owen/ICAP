@@ -50,5 +50,10 @@ namespace ICAP_Infrastructure.Repositories
             var filter = _filterBuilder.Eq(entity => entity.Id, id);
             await _dbCollection.DeleteOneAsync(filter);
         }
+
+        public async Task RemoveAsync(Expression<Func<T, bool>> filter)
+        {
+            await _dbCollection.DeleteManyAsync(filter);
+        }
     }
 }

@@ -10,6 +10,7 @@ namespace ICAP_Infrastructure.Repositories
         Task<T?> GetAsync(string id);
         Task<T?> GetAsync(Expression<Func<T, bool>> filter);
         Task RemoveAsync(string id);
+        Task RemoveAsync(Expression<Func<T, bool>> filter);
         Task UpdateAsync(T entity);
     }
 }
