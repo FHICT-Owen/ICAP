@@ -28,7 +28,7 @@ namespace ICAP_RelationService.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult > SendAsync(FriendRequest data)
+        public async Task<IActionResult> SendAsync(FriendRequest data)
         {
             var request = new FriendRequest
             {
@@ -42,7 +42,7 @@ namespace ICAP_RelationService.Controllers
             };
 
             await friendRequestsRepository.CreateAsync(request);
-            return Created(Request.Path, data);
+            return Created(Request.Path, request);
         }
 
         [HttpPut("Accept/{id}")]

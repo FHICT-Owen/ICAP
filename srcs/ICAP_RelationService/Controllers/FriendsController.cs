@@ -28,14 +28,14 @@ namespace ICAP_RelationService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Friends>> AddAsync(Friends data)
+        public async Task<ActionResult<Friends>> AddAsync(Friends request)
         {
-            var request = new Friends
+            var data = new Friends
             {
-                FriendIds = data.FriendIds
+                FriendIds = request.FriendIds
             };
 
-            await friendsRepository.CreateAsync(request);
+            await friendsRepository.CreateAsync(data);
             return Created(Request.Path, data);
         }
 
