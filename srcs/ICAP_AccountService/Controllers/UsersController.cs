@@ -1,7 +1,6 @@
 ﻿using ICAP_AccountService.Entities;
 using ICAP_Infrastructure.Repositories;
 using MassTransit;
-using MassTransit.Transports;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
@@ -16,6 +15,7 @@ namespace ICAP_AccountService.Controllers
     [Route("users")]
     public class UsersController(IRepository<User> usersRepository, IBus bus) : ControllerBase
     {
+        public record UserDto(string Name, string Email);
         [HttpGet]
         public async Task<IEnumerable<User>> GetAsync()
         {
@@ -56,9 +56,15 @@ namespace ICAP_AccountService.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutAsync(User data)
+        public async Task<IActionResult> PutAsync(UserDto data)
         {
-            var existingItem = await usersRepository.GetAsync(data.Id);
+            var authorizationHeader = Request.Headers.Authorization.ToString();
+            if (authorizationHeader.IsNullOrEmpty()) return BadRequest();
+            var decodedToken = GetTokenFromAuthHeader(authorizationHeader);
+            var oid = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
+
+            var existingItem = await usersRepository.GetAsync(oid);
+            if (existingItem is null) return NotFound();
             existingItem.Name = data.Name;
             existingItem.Email = data.Email;
             
@@ -74,7 +80,7 @@ namespace ICAP_AccountService.Controllers
             if (authorizationHeader.IsNullOrEmpty()) return BadRequest();
             var decodedToken = GetTokenFromAuthHeader(authorizationHeader);
             var oid = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
-            if (oid == null) return BadRequest("Unable to get OID from token");
+            if (oid.IsNullOrEmpty()) return BadRequest("Unable to get OID from token");
 
             var endpoint = await bus.GetSendEndpoint(new Uri("topic:deleteuserdata"));
             await endpoint.Send(oid);

@@ -5,19 +5,13 @@ using MassTransit;
 namespace ICAP_AccountService.Events
 {
     public record FriendRequestAcceptedData(string UserId, string UserToAdd);
-    public class FriendRequestAccepted : IConsumer<FriendRequestAcceptedData>
+    public class FriendRequestAccepted(IRepository<User> usersRepository) : IConsumer<FriendRequestAcceptedData>
     {
-        private readonly IRepository<User> _usersRepository;
-        public FriendRequestAccepted( IRepository<User> usersRepository)
-        {
-            _usersRepository = usersRepository;
-        }
-
         public async Task Consume(ConsumeContext<FriendRequestAcceptedData> ctx)
         {
-            var user = await _usersRepository.GetAsync(ctx.Message.UserId);
+            var user = await usersRepository.GetAsync(ctx.Message.UserId);
             if (user == null) return;
-            await _usersRepository.UpdateAsync(user);
+            await usersRepository.UpdateAsync(user);
         }
     }
 }
