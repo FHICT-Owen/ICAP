@@ -1,11 +1,11 @@
-﻿using ICAP_Infrastructure.Repositories;
+﻿using ICAP_Infrastructure.MTDtos;
+using ICAP_Infrastructure.Repositories;
 using ICAP_MarketService.Entities;
 using MassTransit;
 
 
 namespace ICAP_RelationService.Events
 {
-    public record DeleteUserData(string UserId);
     public class DeleteUserDataEvent(IRepository<MarketListing> marketRepository) : IConsumer<DeleteUserData>
     {
         public async Task Consume(ConsumeContext<DeleteUserData> ctx)

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using ICAP_Infrastructure.MTDtos;
 
 namespace ICAP_AccountService.Controllers
 {
@@ -75,8 +76,6 @@ namespace ICAP_AccountService.Controllers
 
             return Ok();
         }
-
-        public record DeleteUserData(string UserId);
 
         [Authorize]
         [RequiredScope("access_as_user")]
