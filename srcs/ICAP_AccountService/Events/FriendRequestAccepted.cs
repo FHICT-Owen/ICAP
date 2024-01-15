@@ -17,7 +17,6 @@ namespace ICAP_AccountService.Events
         private async Task ProcessMessage(FriendRequestAcceptedData data)
         {
             var user = await _usersRepository.GetAsync(data.UserId);
-            // TODO: Refactor ASAP
             await _usersRepository.UpdateAsync(user);
         }
     }
