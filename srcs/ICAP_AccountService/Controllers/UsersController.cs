@@ -90,9 +90,7 @@ namespace ICAP_AccountService.Controllers
             var oid = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
             if (oid.IsNullOrEmpty()) return BadRequest("Unable to get OID from token");
 
-            var endpoint = await bus.GetSendEndpoint(new Uri("topic:deleteuserdata"));
-            await endpoint.Send(new DeleteUserData(oid));
-
+            await bus.Publish(new DeleteUserData(oid));
             var existingItem = await usersRepository.GetAsync(oid);
             if (existingItem == null) return NotFound("User was not found");
             await usersRepository.RemoveAsync(existingItem.Id);

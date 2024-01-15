@@ -50,6 +50,12 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddMassTransit(x =>
 {
+    var entryAssembly = Assembly.GetEntryAssembly();
+    x.AddConsumers(entryAssembly);
+    x.AddSagaStateMachines(entryAssembly);
+    x.AddSagas(entryAssembly);
+    x.AddActivities(entryAssembly);
+
     x.UsingAzureServiceBus((context, cfg) =>
     {
         cfg.Host(builder.Configuration["AzureServiceBus"]);

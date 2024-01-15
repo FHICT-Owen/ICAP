@@ -1,10 +1,12 @@
 using ICAP_Infrastructure;
 using ICAP_Infrastructure.Repositories;
 using ICAP_MarketService.Entities;
+using ICAP_RelationService.Events;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,12 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddMassTransit(x =>
 {
+    var entryAssembly = Assembly.GetEntryAssembly();
+    x.AddConsumers(entryAssembly);
+    x.AddSagaStateMachines(entryAssembly);
+    x.AddSagas(entryAssembly);
+    x.AddActivities(entryAssembly);
+
     x.UsingAzureServiceBus((context, cfg) =>
     {
         cfg.Host(builder.Configuration["AzureServiceBus"]);
