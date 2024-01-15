@@ -72,27 +72,12 @@ namespace ICAP_AccountService.Controllers
         {
             var authorizationHeader = Request.Headers.Authorization.ToString();
             if (authorizationHeader.IsNullOrEmpty()) return BadRequest();
-            var oid = GetOidFromToken(authorizationHeader);
-            if (oid == null) return BadRequest("Unable to get OID from token");
-
-            await busPublisher.SendMessageAsync(oid, "DeleteUserData");
+            var decodedToken = GetTokenFromAuthHeader(authorizationHeader);
+            var oid = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
             var existingItem = await usersRepository.GetAsync(oid);
             if (existingItem == null) return NotFound("User was not found");
             await usersRepository.RemoveAsync(existingItem.Id);
             return Ok();
-        }
-
-        private string? GetOidFromToken(string authorizationHeader)
-        {
-            if (string.IsNullOrWhiteSpace(authorizationHeader) || !authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-            {
-                return null;
-            }
-            var token = authorizationHeader["Bearer ".Length..].Trim();
-            var jwtHandler = new JwtSecurityTokenHandler();
-            var decodedToken = jwtHandler.ReadJwtToken(token);
-            var oidClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
-            return oidClaim?.Value;
         }
 
         private JwtSecurityToken GetTokenFromAuthHeader(string authorizationHeader)
