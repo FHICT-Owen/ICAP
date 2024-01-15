@@ -4,6 +4,7 @@ using ICAP_RelationService.Events;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,8 +32,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowedSpecificOrigins", builder =>
-        builder.WithOrigins("http://localhost",
+    options.AddPolicy("AllowedSpecificOrigins", policy =>
+        policy.WithOrigins("http://localhost",
                             "https://localhost",
                             "https://icap.odb-tech.com")
                .AllowAnyMethod()
@@ -50,7 +51,6 @@ builder.Services.AddMassTransit(x =>
         cfg.Host(builder.Configuration["AzureServiceBus"]);
         cfg.ConfigureEndpoints(context);
     });
-    x.AddConsumer<DeleteUserData>();
 });
 
 builder.Services.AddMongo()
