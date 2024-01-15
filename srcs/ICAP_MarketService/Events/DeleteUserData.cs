@@ -3,8 +3,7 @@ using ICAP_Infrastructure.Repositories;
 using ICAP_MarketService.Entities;
 using MassTransit;
 
-
-namespace ICAP_RelationService.Events
+namespace ICAP_MarketService.Events
 {
     public class DeleteUserDataEvent(IRepository<MarketListing> marketRepository) : IConsumer<DeleteUserData>
     {
