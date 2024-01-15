@@ -47,16 +47,21 @@
         _drawerOpen = !_drawerOpen;
     }
 
+
     protected override async Task OnInitializedAsync()
     {
-        var tokenResult = await AuthorizationService.RequestAccessToken();
-        if (tokenResult.Status != AccessTokenResultStatus.Success) return;
-        if (!tokenResult.TryGetToken(out var token))
+        bool tokenAcquired = false;
+        while (!tokenAcquired)
         {
-            throw new InvalidOperationException(
-                "Failed to provision the access token.");
-        }
-
-        await AccountServiceClient.SendTokenAsync(token.Value);
+            var tokenResult = await AuthorizationService.RequestAccessToken();
+            if (tokenResult.Status == AccessTokenResultStatus.Success &&
+            tokenResult.TryGetToken(out var token))
+            {
+                await AccountServiceClient.SendTokenAsync(token.Value);
+                tokenAcquired = true;
+            }
+            else await Task.Delay(10000);
+            Console.WriteLine(tokenAcquired);
+        }        
     }
 }
