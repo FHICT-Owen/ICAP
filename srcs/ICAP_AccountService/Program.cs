@@ -1,7 +1,7 @@
 using ICAP_AccountService.Entities;
 using ICAP_AccountService.Events;
 using ICAP_Infrastructure.Repositories;
-using ICAP_ServiceBus;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 
@@ -43,8 +43,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.UseAzureServiceBusPublisher(builder.Configuration);
-builder.Services.UseAzureServiceBusHandler(builder.Configuration);
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingAzureServiceBus((context, cfg) =>
+    {
+        cfg.Host(builder.Configuration["AzureServiceBus"]);
+        cfg.ConfigureEndpoints(context);
+    });
+    x.AddConsumer<FriendRequestAccepted>();
+});
 
 builder.Services.AddMongo()
     .AddMongoRepository<User>("users");

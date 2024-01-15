@@ -1,4 +1,4 @@
-using ICAP_ServiceBus;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 
@@ -40,8 +40,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.UseAzureServiceBusPublisher(builder.Configuration);
-builder.Services.UseAzureServiceBusHandler(builder.Configuration);
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingAzureServiceBus((context, cfg) =>
+    {
+        cfg.Host(builder.Configuration["AzureServiceBus"]);
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 var app = builder.Build();
 

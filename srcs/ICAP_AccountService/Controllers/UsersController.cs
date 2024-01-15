@@ -1,12 +1,12 @@
 ﻿using ICAP_AccountService.Entities;
 using ICAP_Infrastructure.Repositories;
-using ICAP_ServiceBus;
+using MassTransit;
+using MassTransit.Transports;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace ICAP_AccountService.Controllers
 {
@@ -14,7 +14,7 @@ namespace ICAP_AccountService.Controllers
     [RequiredScope("access_as_user")]
     [ApiController]
     [Route("users")]
-    public class UsersController(IRepository<User> usersRepository, IBusPublisher busPublisher) : ControllerBase
+    public class UsersController(IRepository<User> usersRepository, IBus bus) : ControllerBase
     {
         [HttpGet]
         public async Task<IEnumerable<User>> GetAsync()
@@ -76,7 +76,9 @@ namespace ICAP_AccountService.Controllers
             var oid = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
             if (oid == null) return BadRequest("Unable to get OID from token");
 
-            await busPublisher.SendMessageAsync(oid, "DeleteUserData");
+            var endpoint = await bus.GetSendEndpoint(new Uri("topic:deleteuserdata"));
+            await endpoint.Send(oid);
+
             var existingItem = await usersRepository.GetAsync(oid);
             if (existingItem == null) return NotFound("User was not found");
             await usersRepository.RemoveAsync(existingItem.Id);

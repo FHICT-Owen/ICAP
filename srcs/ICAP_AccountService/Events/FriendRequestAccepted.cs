@@ -1,22 +1,22 @@
 ﻿using ICAP_AccountService.Entities;
 using ICAP_Infrastructure.Repositories;
-using ICAP_ServiceBus;
+using MassTransit;
 
 namespace ICAP_AccountService.Events
 {
-    public class FriendRequestAccepted
+    public record FriendRequestAcceptedData(string UserId, string UserToAdd);
+    public class FriendRequestAccepted : IConsumer<FriendRequestAcceptedData>
     {
-        private record FriendRequestAcceptedData (string UserId, string UserToAdd);
         private readonly IRepository<User> _usersRepository;
-        public FriendRequestAccepted(IBusHandler busHandler, IRepository<User> usersRepository)
+        public FriendRequestAccepted( IRepository<User> usersRepository)
         {
             _usersRepository = usersRepository;
-            busHandler.CreateBusHandler<FriendRequestAcceptedData>("friendrequesttopic", "friendrequestsub", ProcessMessage);
         }
 
-        private async Task ProcessMessage(FriendRequestAcceptedData data)
+        public async Task Consume(ConsumeContext<FriendRequestAcceptedData> ctx)
         {
-            var user = await _usersRepository.GetAsync(data.UserId);
+            var user = await _usersRepository.GetAsync(ctx.Message.UserId);
+            if (user == null) return;
             await _usersRepository.UpdateAsync(user);
         }
     }

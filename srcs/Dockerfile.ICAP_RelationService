@@ -3,8 +3,7 @@ WORKDIR /app
 
 COPY ./ICAP_RelationService ./ICAP_RelationService
 COPY ./ICAP_Infrastructure ./ICAP_Infrastructure
-COPY ./ICAP_ServiceBus ./ICAP_ServiceBus
-RUN ls ./
+
 RUN dotnet restore ./ICAP_RelationService/*.csproj
 RUN dotnet publish ./ICAP_RelationService/*.csproj -c Release -o out
 
