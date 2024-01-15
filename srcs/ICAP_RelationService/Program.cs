@@ -1,7 +1,6 @@
 using ICAP_Infrastructure;
 using ICAP_Infrastructure.Repositories;
 using ICAP_RelationService.Entities;
-using ICAP_RelationService.Events;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;

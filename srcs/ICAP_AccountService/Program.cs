@@ -1,11 +1,10 @@
-using System.Reflection;
 using ICAP_AccountService.Entities;
-using ICAP_AccountService.Events;
 using ICAP_Infrastructure;
 using ICAP_Infrastructure.Repositories;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
