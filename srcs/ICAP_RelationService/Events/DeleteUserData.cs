@@ -6,11 +6,11 @@ using MassTransit;
 
 namespace ICAP_RelationService.Events
 {
-    public class DeleteUserDataEvent(IRepository<Friends> friendRepository, IRepository<FriendRequest> friendRequestRepository) : IConsumer<DeleteUserData>
+    public class DeleteUserDataFromRelationService(IRepository<Friends> friendRepository, IRepository<FriendRequest> friendRequestRepository, ILogger<DeleteUserDataFromRelationService> logger) : IConsumer<DeleteUserData>
     {
         public async Task Consume(ConsumeContext<DeleteUserData> ctx)
         {
-            Console.WriteLine($"Removing data for user {ctx.Message}");
+            logger.LogInformation($"Removing data for user {ctx.Message}");
             await friendRepository.RemoveAsync(ctx.Message.UserId);
             await friendRequestRepository.RemoveAsync(filter =>
                 filter.UserFrom == ctx.Message.UserId || filter.UserTo == ctx.Message.UserId);
