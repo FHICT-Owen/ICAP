@@ -3,8 +3,7 @@ WORKDIR /app
 
 COPY ./ICAP_MarketService ./ICAP_MarketService
 COPY ./ICAP_Infrastructure ./ICAP_Infrastructure
-COPY ./ICAP_ServiceBus ./ICAP_ServiceBus
-RUN ls ./
+
 RUN dotnet restore ./ICAP_MarketService/*.csproj
 RUN dotnet publish ./ICAP_MarketService/*.csproj -c Release -o out
 

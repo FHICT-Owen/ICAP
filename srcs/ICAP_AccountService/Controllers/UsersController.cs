@@ -1,21 +1,21 @@
 ﻿using ICAP_AccountService.Entities;
 using ICAP_Infrastructure.Repositories;
-using ICAP_ServiceBus;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using ICAP_Infrastructure.MTDtos;
 
 namespace ICAP_AccountService.Controllers
 {
-    [Authorize]
-    [RequiredScope("access_as_user")]
     [ApiController]
     [Route("users")]
-    public class UsersController(IRepository<User> usersRepository, IBusPublisher busPublisher) : ControllerBase
+    public class UsersController(IRepository<User> usersRepository, IBus bus) : ControllerBase
     {
+        public record UserDto(string Name, string Email);
+
         [HttpGet]
         public async Task<IEnumerable<User>> GetAsync()
         {
@@ -30,6 +30,8 @@ namespace ICAP_AccountService.Controllers
             return item;
         }
 
+        [Authorize]
+        [RequiredScope("access_as_user")]
         [HttpPost]
         public async Task<ActionResult<User>> PostAsync()
         {
@@ -55,10 +57,18 @@ namespace ICAP_AccountService.Controllers
             return Created(Request.Path, request);
         }
 
+        [Authorize]
+        [RequiredScope("access_as_user")]
         [HttpPut]
-        public async Task<IActionResult> PutAsync(User data)
+        public async Task<IActionResult> PutAsync(UserDto data)
         {
-            var existingItem = await usersRepository.GetAsync(data.Id);
+            var authorizationHeader = Request.Headers.Authorization.ToString();
+            if (authorizationHeader.IsNullOrEmpty()) return BadRequest();
+            var decodedToken = GetTokenFromAuthHeader(authorizationHeader);
+            var oid = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
+
+            var existingItem = await usersRepository.GetAsync(oid);
+            if (existingItem is null) return NotFound();
             existingItem.Name = data.Name;
             existingItem.Email = data.Email;
             
@@ -67,32 +77,23 @@ namespace ICAP_AccountService.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [RequiredScope("access_as_user")]
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync()
         {
+
             var authorizationHeader = Request.Headers.Authorization.ToString();
             if (authorizationHeader.IsNullOrEmpty()) return BadRequest();
-            var oid = GetOidFromToken(authorizationHeader);
-            if (oid == null) return BadRequest("Unable to get OID from token");
+            var decodedToken = GetTokenFromAuthHeader(authorizationHeader);
+            var oid = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
+            if (oid.IsNullOrEmpty()) return BadRequest("Unable to get OID from token");
 
-            await busPublisher.SendMessageAsync(oid, "DeleteUserData");
+            await bus.Publish(new DeleteUserData(oid));
             var existingItem = await usersRepository.GetAsync(oid);
             if (existingItem == null) return NotFound("User was not found");
             await usersRepository.RemoveAsync(existingItem.Id);
             return Ok();
-        }
-
-        private string? GetOidFromToken(string authorizationHeader)
-        {
-            if (string.IsNullOrWhiteSpace(authorizationHeader) || !authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-            {
-                return null;
-            }
-            var token = authorizationHeader["Bearer ".Length..].Trim();
-            var jwtHandler = new JwtSecurityTokenHandler();
-            var decodedToken = jwtHandler.ReadJwtToken(token);
-            var oidClaim = decodedToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
-            return oidClaim?.Value;
         }
 
         private JwtSecurityToken GetTokenFromAuthHeader(string authorizationHeader)

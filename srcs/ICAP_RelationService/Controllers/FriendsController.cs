@@ -9,9 +9,10 @@ namespace ICAP_RelationService.Controllers
     [Authorize]
     [RequiredScope("access_as_user")]
     [ApiController]
-    [Route("[controller]")]
+    [Route("friends")]
     public class FriendsController(IRepository<Friends> friendsRepository) : ControllerBase
     {
+        public record FriendDto(List<string> FriendIds);
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Friends>>> GetAsync()
         {
@@ -28,14 +29,14 @@ namespace ICAP_RelationService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Friends>> AddAsync(Friends data)
+        public async Task<ActionResult<Friends>> AddAsync(FriendDto request)
         {
-            var request = new Friends
+            var data = new Friends
             {
-                FriendIds = data.FriendIds
+                FriendIds = request.FriendIds
             };
 
-            await friendsRepository.CreateAsync(request);
+            await friendsRepository.CreateAsync(data);
             return Created(Request.Path, data);
         }
 

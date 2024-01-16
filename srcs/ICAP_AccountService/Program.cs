@@ -1,23 +1,28 @@
 using ICAP_AccountService.Entities;
-using ICAP_AccountService.Events;
+using ICAP_Infrastructure;
 using ICAP_Infrastructure.Repositories;
-using ICAP_ServiceBus;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 const string secretPath = "/mnt/secrets-store";
-var secretFiles = Directory.GetFiles(secretPath);
-if (secretFiles.Any())
+try
 {
-    foreach (var file in secretFiles)
+    var secretFiles = Directory.GetFiles(secretPath);
+    if (secretFiles.Any())
     {
-        var secretName = Path.GetFileName(file);
-        var secretValue = File.ReadAllText(file);
-        Environment.SetEnvironmentVariable(secretName, secretValue);
+        foreach (var file in secretFiles)
+        {
+            var secretName = Path.GetFileName(file);
+            var secretValue = File.ReadAllText(file);
+            Environment.SetEnvironmentVariable(secretName, secretValue);
+        }
     }
-} 
+} catch (Exception) { }
+
 
 builder.Configuration.AddEnvironmentVariables();
 
@@ -27,8 +32,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowedSpecificOrigins", builder =>
-        builder.WithOrigins("http://localhost",
+    options.AddPolicy("AllowedSpecificOrigins", policy =>
+        policy.WithOrigins("http://localhost",
                             "https://localhost",
                             "https://icap.odb-tech.com")
                .AllowAnyMethod()
@@ -37,31 +42,41 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    if (!builder.Environment.IsDevelopment()) c.DocumentFilter<BasePathFilter>("/accounts");
+});
 
-builder.Services.UseAzureServiceBusPublisher(builder.Configuration);
-builder.Services.UseAzureServiceBusHandler(builder.Configuration);
+builder.Services.AddMassTransit(x =>
+{
+    var entryAssembly = Assembly.GetEntryAssembly();
+    x.AddConsumers(entryAssembly);
+    x.AddSagaStateMachines(entryAssembly);
+    x.AddSagas(entryAssembly);
+    x.AddActivities(entryAssembly);
+
+    x.UsingAzureServiceBus((context, cfg) =>
+    {
+        cfg.Host(builder.Configuration["AzureServiceBus"]);
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 builder.Services.AddMongo()
     .AddMongoRepository<User>("users");
 
-builder.Services.AddSingleton<FriendRequestAccepted>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
+app.UseCors("AllowedSpecificOrigins");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseCors("AllowedSpecificOrigins");
 
 app.Run();

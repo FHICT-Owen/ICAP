@@ -1,28 +1,19 @@
-﻿using ICAP_Infrastructure.Repositories;
+﻿using ICAP_Infrastructure.MTDtos;
+using ICAP_Infrastructure.Repositories;
 using ICAP_RelationService.Entities;
-using ICAP_ServiceBus;
+using MassTransit;
+
 
 namespace ICAP_RelationService.Events
 {
-    public class DeleteUserData
+    public class DeleteUserDataFromRelationService(IRepository<Friends> friendRepository, IRepository<FriendRequest> friendRequestRepository, ILogger<DeleteUserDataFromRelationService> logger) : IConsumer<DeleteUserData>
     {
-        private readonly IRepository<Friends> _friendRepository;
-        private readonly IRepository<FriendRequest> _friendRequestRepository;
-        public DeleteUserData(IBusHandler busHandler, IRepository<Friends> friendRepository, IRepository<FriendRequest> friendRequestRepository)
+        public async Task Consume(ConsumeContext<DeleteUserData> ctx)
         {
-            _friendRepository = friendRepository;
-            _friendRequestRepository = friendRequestRepository;
-            busHandler.CreateBusHandler<string>("deleteuserdata", "DeleteUserDataFromRelationService", ProcessMessage);
-        }
-
-        private async Task ProcessMessage(string id)
-        {
-            await _friendRepository.RemoveAsync(id);
-            var requestsToAndFromUser = await _friendRequestRepository.GetAllAsync(request => request.UserFrom == id && request.UserTo == id);
-            foreach (var request in requestsToAndFromUser)
-            {
-                await _friendRequestRepository.RemoveAsync(request.Id);
-            }
+            logger.LogInformation($"Removing data for user {ctx.Message}");
+            await friendRepository.RemoveAsync(ctx.Message.UserId);
+            await friendRequestRepository.RemoveAsync(filter =>
+                filter.UserFrom == ctx.Message.UserId || filter.UserTo == ctx.Message.UserId);
         }
     }
 }
