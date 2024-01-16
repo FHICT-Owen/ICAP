@@ -50,7 +50,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        bool tokenAcquired = false;
+        var tokenAcquired = false;
         while (!tokenAcquired)
         {
             var tokenResult = await AuthorizationService.RequestAccessToken();
