@@ -12,6 +12,7 @@ namespace ICAP_RelationService.Controllers
     [Route("friends")]
     public class FriendsController(IRepository<Friends> friendsRepository) : ControllerBase
     {
+        public record FriendDto(List<string> FriendIds);
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Friends>>> GetAsync()
         {
@@ -28,7 +29,7 @@ namespace ICAP_RelationService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Friends>> AddAsync(Friends request)
+        public async Task<ActionResult<Friends>> AddAsync(FriendDto request)
         {
             var data = new Friends
             {

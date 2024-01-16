@@ -12,6 +12,7 @@ namespace ICAP_RelationService.Controllers
     [Route("friendrequests")]
     public class FriendRequestsController(IRepository<FriendRequest> friendRequestsRepository) : ControllerBase
     {
+        public record FriendRequestDto(string UserFrom, string UserTo);
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FriendRequest>>> GetAsync()
         {
@@ -28,7 +29,7 @@ namespace ICAP_RelationService.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendAsync(FriendRequest data)
+        public async Task<IActionResult> SendAsync(FriendRequestDto data)
         {
             var request = new FriendRequest
             {
