@@ -143,13 +143,12 @@ jobs:
   deploy-client:
     needs: [filter, build-client]
     runs-on: windows-latest
-    needs: build
     steps:
     - name: Download artifact from build job
       if: needs.filter.outputs.ICAP_Client == 'true'
       uses: actions/download-artifact@v3
       with:
-        name: webapp
+        name: ICAP-Client
         path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
     - name: Deploy to Azure WebApp
       if: needs.filter.outputs.ICAP_Client == 'true'
