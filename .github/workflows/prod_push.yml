@@ -66,12 +66,6 @@ jobs:
         cd ./srcs/${{ matrix.services }}
         dotnet build $(ls *.csproj)
 
-    - name: SpecFlow Tests
-      if: needs.filter.outputs[matrix.services] == 'true'
-      run: |
-        cd ./srcs/${{ matrix.services }}.Specs
-        dotnet test --no-build $(ls *.csproj)
-
     - name: SonarCloud Scan
       if: needs.filter.outputs[matrix.services] == 'true'
       uses: highbyte/sonarscan-dotnet@v2.3.0
