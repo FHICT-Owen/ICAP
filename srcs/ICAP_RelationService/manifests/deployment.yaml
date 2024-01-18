@@ -27,7 +27,7 @@ spec:
           requests:
             cpu: 250m
           limits:
-            cpu: 2500m
+            cpu: 500m
       volumes:
       - name: secrets-store-relationservice
         csi:
