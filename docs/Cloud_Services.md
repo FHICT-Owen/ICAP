@@ -10,6 +10,12 @@ Key Azure services such as Azure Entra Identity, Azure Kubernetes Service (AKS),
 
 ## Azure Cloud Services
 
+Below here is a screenshot with all of the different resources that are in my main resource group on my Azure Portal for ICAP specifically.
+
+![](./Media/Technologies.png)
+
+In the following few sections I'll be highlighting the most important cloud services within the project.
+
 ### Azure Entra Identity (Formerly Azure AD)
 - **Usage**: Provides comprehensive solutions for authentication, authorization, and user/application management. Integrates seamlessly with Azure Role-Based Access Control (RBAC).
 - **Cost Consideration**: Azure AD External Identities pricing is based on Monthly Active Users (MAU). The first 50,000 MAUs per month are free for both Premium P1 and Premium P2 features.
@@ -23,11 +29,10 @@ Key Azure services such as Azure Entra Identity, Azure Kubernetes Service (AKS),
 - **Usage**: Utilized for secure storage and management of secrets, keys, and certificates. Integrates with Azure services for seamless access management.
 - **Cost Consideration**: Secrets operations cost $0.03/10,000 transactions, Certificate operations cost $3 per renewal request and $0.03/10,000 transactions for all other operations. Managed HSM Pools have varying costs, e.g., Standard B1 at $3.20 Hourly usage fee per HSM pool.
 
-### Azure Static Web App
+### Azure App service
 - **Usage**: Hosts the client-side of the system, providing a scalable and secure web hosting service.
-- **In Production**: Switching to the Standard tier for general purpose production apps is recommended.
-- **Cost Consideration**: Offers both a Free and Standard tier, with the Standard Tier costing ~$9/per app/month. If he Enterprise-grade edge solution is used then an additional $17.52/per app/month is charged.
-
+- **In Production**: Switching to a non-development tier is recommended for production.
+- **Cost Consideration**: Offers Free, shared and production tiers with costs ranging from ~$50 all the way up to ~$2000 per month.
 
 ### Azure Container Registry (ACR)
 - **Usage**: Acts as a repository for container images, integrating with CI/CD pipelines for image storage and retrieval.

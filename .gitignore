@@ -396,3 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+srcs/ICAP_AccountService.Specs/appsettings.json

@@ -1,4 +1,4 @@
-﻿using ICAP_Infrastructure.Repositories;
+﻿using ICAP_MarketService.Collections;
 using ICAP_MarketService.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,24 +8,23 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace ICAP_MarketService.Controllers
 {
-    
+    public record MarketListingDto(string Title, string Description, double Price, ServiceCategory Category, string ImageLink);
+
     [ApiController]
     [Route("listings")]
-    public class MarketListingController(IRepository<MarketListing> listingRepository) : ControllerBase
+    public class MarketListingController(MarketListingCollection listings) : ControllerBase
     {
-        public record MarketListingDto(string Title, string Description);
-
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MarketListing>>> GetAsync()
         {
-            var items = await listingRepository.GetAllAsync();
+            var items = await listings.GetAllListingsAsync();
             return Ok(items);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<MarketListing>> GetByIdAsync(string id)
         {
-            var item = await listingRepository.GetAsync(id);
+            var item = await listings.GetListingAsync(id);
             if (item is null) return NotFound();
             return Ok(item);
         }
@@ -40,42 +39,31 @@ namespace ICAP_MarketService.Controllers
             var decodedToken = GetTokenFromAuthHeader(authorizationHeader);
             var oid = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
 
-            var data = new MarketListing
-            {
-                Id = Guid.NewGuid().ToString(),
-                UserId = oid,
-                Title = reqData.Title,
-                Description = reqData.Description,
-                CreatedDateTime = DateTimeOffset.Now
-            };
-            var userResult = await listingRepository.GetAllAsync(listing => listing.Title == reqData.Title && listing.UserId == oid);
-            if (userResult.Count > 0) return Conflict("A listing for your user with the same title already exists.");
-            await listingRepository.CreateAsync(data);
-            return Created(Request.Path, data);
+            var result = await listings.AddListingAsync(reqData, oid);
+            return result.Match<ActionResult>(
+                successResult => Created(Request.Path, successResult.Entity), 
+                failureResult => BadRequest(failureResult.HelperText));
         }
 
         [Authorize]
         [RequiredScope("access_as_user")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditListingAsync(MarketListingDto reqData, string id)
+        public async Task<IActionResult> EditAsync(MarketListingDto reqData, string id)
         {
-            var existingItem = await listingRepository.GetAsync(id);
-            if (existingItem is null) return NotFound();
-            existingItem.Description = reqData.Description;
-            existingItem.Title = reqData.Title;
-            await listingRepository.UpdateAsync(existingItem);
-            return Ok();
+            var result = await listings.EditListingAsync(reqData, id);
+
+            return result.Match<IActionResult>(
+                successResult => Ok(successResult.Entity),
+                failureResult => BadRequest(failureResult.HelperText));
         }
 
         [Authorize]
         [RequiredScope("access_as_user")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> RemoveListingAsync(string id)
+        public async Task<IActionResult> RemoveAsync(string id)
         {
-            var existingItem = await listingRepository.GetAsync(id);
-            if (existingItem is null) return NotFound();
-            await listingRepository.RemoveAsync(id);
-            return Ok();
+            var result = await listings.RemoveListingAsync(id);
+            return result ? Ok() : NotFound("Could not find listing with corresponding ID");
         }
 
         private JwtSecurityToken GetTokenFromAuthHeader(string authorizationHeader)

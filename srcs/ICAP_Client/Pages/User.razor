@@ -22,7 +22,7 @@
 
 <h2>Access token</h2>
 
-<p id="access-token">@AccessToken?.Value</p>
+<p id="access-token" label="access-token">@AccessToken?.Value</p>
 
 <h2>Access token claims</h2>
 
@@ -97,7 +97,7 @@
         if (result)
         {
             Snackbar.Add("Removed user data successfully! You will be logged out momentarily.", Severity.Success);
-            Thread.Sleep(5000);
+            await Task.Delay(5000);
             Navmanager.NavigateToLogout("/authentication/logout", "/");
         }
         else Snackbar.Add("Unable to delete data, account service returned an error", Severity.Error);

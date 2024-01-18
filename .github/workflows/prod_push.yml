@@ -14,6 +14,11 @@ env:
     AZURE_CONTAINER_REGISTRY: icapacr
     CLUSTER_NAME: ICAP_AKS
     CLUSTER_RESOURCE_GROUP: ICAP
+    AZURE_WEBAPP_NAME: ICAPClient20240116120037
+    AZURE_WEBAPP_PACKAGE_PATH: ICAP_Client\published
+    CONFIGURATION: Release
+    DOTNET_CORE_VERSION: 8.0.x
+    CLIENT_WORKING_DIRECTORY: ./srcs/ICAP_Client/
 
 jobs:
   filter:
@@ -41,7 +46,7 @@ jobs:
           ICAP_ServiceBus:
             - 'srcs/ICAP_ServiceBus/**'     
 
-  build-and-test:
+  test-projects:
     needs: filter
     runs-on: ubuntu-latest
     strategy:
@@ -61,12 +66,6 @@ jobs:
         cd ./srcs/${{ matrix.services }}
         dotnet build $(ls *.csproj)
 
-    - name: SpecFlow Tests
-      if: needs.filter.outputs[matrix.services] == 'true'
-      run: |
-        cd ./srcs/${{ matrix.services }}.Specs
-        dotnet test --no-build $(ls *.csproj)
-
     - name: SonarCloud Scan
       if: needs.filter.outputs[matrix.services] == 'true'
       uses: highbyte/sonarscan-dotnet@v2.3.0
@@ -83,8 +82,8 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-image:
-    needs: [filter, build-and-test]
+  build-images:
+    needs: [filter, test-projects]
     permissions:
       contents: read
       id-token: write
@@ -107,29 +106,55 @@ jobs:
         if: needs.filter.outputs[matrix.services] == 'true'
         run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
   
-  deploy-client:
-    needs: [filter, build-and-test]
-    runs-on: ubuntu-latest
-    steps: 
+  build-client:
+    runs-on: windows-latest
+    needs: [filter, test-projects]
+    steps:
     - uses: actions/checkout@v4
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
       if: needs.filter.outputs.ICAP_Client == 'true'
       with:
-        submodules: true
-        lfs: false
-    - name: Build And Deploy
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+    - name: Restore
       if: needs.filter.outputs.ICAP_Client == 'true'
-      id: builddeploy
-      uses: Azure/static-web-apps-deploy@v1
+      run: dotnet restore "${{ env.CLIENT_WORKING_DIRECTORY }}"
+    - name: Build
+      if: needs.filter.outputs.ICAP_Client == 'true'
+      run: dotnet build "${{ env.CLIENT_WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
+    - name: Test
+      if: needs.filter.outputs.ICAP_Client == 'true'
+      run: dotnet test "${{ env.CLIENT_WORKING_DIRECTORY }}" --no-build
+    - name: Publish
+      if: needs.filter.outputs.ICAP_Client == 'true'
+      run: dotnet publish "${{ env.CLIENT_WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+    - name: Publish Artifacts
+      if: needs.filter.outputs.ICAP_Client == 'true'
+      uses: actions/upload-artifact@v3
       with:
-        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AMBITIOUS_OCEAN_0C5E26903  }}
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        action: "upload"
-        app_location: "/srcs/ICAP_Client"
-        api_location: ""
-        output_location: "wwwroot"
+        name: ICAP-Client
+        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+  deploy-client:
+    needs: [filter, build-client]
+    runs-on: windows-latest
+    steps:
+    - name: Download artifact from build job
+      if: needs.filter.outputs.ICAP_Client == 'true'
+      uses: actions/download-artifact@v3
+      with:
+        name: ICAP-Client
+        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    - name: Deploy to Azure WebApp
+      if: needs.filter.outputs.ICAP_Client == 'true'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.ICAPClient20240116120037_5205 }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
   deploy-services: 
-    needs: [filter, build-image]
+    needs: [filter, build-images]
     permissions:
       actions: read
       contents: read

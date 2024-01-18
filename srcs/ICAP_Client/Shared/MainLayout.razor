@@ -39,7 +39,7 @@
 
 @code {
     bool _drawerOpen = true;
-    void LogOut() => Navigation.NavigateToLogout("/authentication/logout", "/");
+    void LogOut() => Navigation.NavigateToLogout("/authentication/logout");
     void LogIn() => Navigation.NavigateToLogin("/authentication/login");
 
     void DrawerToggle()
@@ -50,7 +50,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        bool tokenAcquired = false;
+        var tokenAcquired = false;
         while (!tokenAcquired)
         {
             var tokenResult = await AuthorizationService.RequestAccessToken();
