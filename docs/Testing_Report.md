@@ -256,3 +256,9 @@ The results from the test setup shown above are shown below, including the Acces
 ![Alt text](./Media/E2ETests_Result.png)
 
 ## Load Testing
+For load testing I decided to create a load test using Azure Load Testing that hit a get endpoint on each of my services. This test consists of the following requests:
+- GET: https://aks.odb-tech.com/accounts/users
+- GET: https://aks.odb-tech.com/market/listings
+- GET: https://aks.odb-tech.com/relations/friendrequests
+
+The test is set up to run on with 250 users per engine and a total of 6 engines at once. The stress test duration is 5 minutes with 1 minute of ramp up time. I made this test to verify that the Horizontal Pod Autoscaler will scale up pods when pods hit more than 10 requests per second per pod.
