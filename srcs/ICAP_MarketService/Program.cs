@@ -5,6 +5,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using System.Reflection;
+using ICAP_MarketService.Collections;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,7 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddSingleton<MarketListingCollection>();
 builder.Services.AddMongo()
     .AddMongoRepository<MarketListing>("marketlistings");
 
