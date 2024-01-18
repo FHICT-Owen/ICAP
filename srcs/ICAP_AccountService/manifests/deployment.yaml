@@ -25,9 +25,9 @@ spec:
           readOnly: true
         resources:
           requests:
-            cpu: 1m
+            cpu: 250m
           limits:
-            cpu: 500m
+            cpu: 2500m
       volumes:
       - name: secrets-store-accountservice
         csi:
