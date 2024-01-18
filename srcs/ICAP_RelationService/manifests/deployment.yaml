@@ -23,6 +23,11 @@ spec:
         - name: secrets-store-relationservice
           mountPath: "/mnt/secrets-store"
           readOnly: true
+        resources:
+          requests:
+            cpu: 1m
+          limits:
+            cpu: 500m
       volumes:
       - name: secrets-store-relationservice
         csi:
