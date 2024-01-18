@@ -41,13 +41,13 @@ namespace ICAP_AccountService.Controllers
 
             var id = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
             var name = decodedToken.Claims.First(claim => claim.Type == "name").Value;
-            var email = decodedToken.Claims.First(claim => claim.Type == "email").Value;
+            var email = decodedToken.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
 
             var request = new User
             {
                 Id = id,
                 Name = name,
-                Email = email,
+                Email = email ?? "No Email Found",
                 CreatedDateTime = DateTimeOffset.Now
             };
             var userResult = await usersRepository.GetAllAsync(user => user.Email == request.Email);

@@ -102,6 +102,16 @@ In conclusion, a combination of these technologies, aligned with C#'s capabiliti
 ## Conclusion
 For ICAP to achieve and maintain the ability to facilitate real-time messaging for possibly millions of users it will be important to use the previously found and mentioned system design paradigms and technologies to achieve the goal. This combination of paradigms and choices will be further expanded on and tested throughout the development and integration of real-time messaging for ICAP.
 
+### Prototype
+The entire development of ICAP within the GitHub repo located at https://github.com/FHICT-Owen/ICAP is the proof of concept and/or applied prototype for this research. From the paradigms and technologies mentioned in this research, the following are already present within ICAP:
+
+- Microservices Architecture
+- Load balancing and Elastic Scalability
+- Asynchronous Processing and Queue Systems (specifically through Azure Service Bus)
+- Kubernetes for Container Orchestration
+
+From this list currently, the WebSocket protocol implementation is still missing. This is due to time restrictions and if the project is continued to be worked on then this would be one of the first things to implement following the continuation of development for ICAP.
+
 ### Future work
 Moving forward, the progression of ICAP and this research has several avenues for future research. It is very important to keep exploring and developing the various features that have not yet been finished for ICAP. 
 
