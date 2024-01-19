@@ -149,9 +149,9 @@ jobs:
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
         ClientId: ${{ secrets.ENTRA_CLIENT_ID }}
         TenantId: ${{ secrets.ENTRA_TENANT_ID }}
-        Scopes: 
-          - ${{ secrets.API_SCOPE_1 }}
+        Scopes: ${{ secrets.API_SCOPES }}
         AzureServiceBus: ${{ secrets.AZ_SB }}
+
 
   run-unit-tests:
     name: XUnit Unit Tests
