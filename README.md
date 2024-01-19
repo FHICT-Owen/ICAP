@@ -12,3 +12,6 @@ Sprint 3 went a lot better. The teachers were happy with the progress I made in 
 
 ## Sprint 4
 Sprint 4 deliverables were pretty mediocre. This comes down to having to do work on a lot of documentation and unforeseen circumstances. Last weekend of delivery I also had to move which took almost an entire week of my time.
+
+## Sprint 5 (final)
+The progress in sprint 5 was very remarkable and good for achieving the learning outcomes that were set out at the start of the semester. I have learned a lot during this semester when it comes to technical learning outcomes. 
