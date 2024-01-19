@@ -1,7 +1,6 @@
-using System.Runtime.InteropServices.JavaScript;
+using DotNetEnv;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
-using Newtonsoft.Json.Linq;
 
 namespace ICAP_Playwright.Tests
 {
@@ -15,25 +14,10 @@ namespace ICAP_Playwright.Tests
         [SetUp]
         public async Task SetupTests()
         {
-            var projectRootPath = Directory.GetCurrentDirectory();
-            while (projectRootPath != null && !Directory.EnumerateFiles(projectRootPath, "*.csproj", SearchOption.TopDirectoryOnly).Any())
-            {
-                projectRootPath = Directory.GetParent(projectRootPath)?.FullName;
-            }
-
-            var filePath = Path.Combine(projectRootPath, "appsettings.json");
-            try
-            {
-                var json = File.ReadAllText(filePath);
-                var configuration = JObject.Parse(json);
-                _email = configuration["Username"]?.ToString() ?? throw new ArgumentNullException();
-                _password = configuration["Password"]?.ToString() ?? throw new ArgumentNullException();
-            }
-            catch (Exception)
-            {
-                _email = Environment.GetEnvironmentVariable("Username") ?? throw new ArgumentNullException();
-                _password = Environment.GetEnvironmentVariable("Password") ?? throw new ArgumentNullException();
-            }
+            Env.TraversePath().Load();
+            _email = Environment.GetEnvironmentVariable("Username") ?? throw new ArgumentNullException();
+            _password = Environment.GetEnvironmentVariable("Password") ?? throw new ArgumentNullException();
+            
             await Page.GotoAsync("https://icap.odb-tech.com/");
             await Page.WaitForSelectorAsync("header");
         }
@@ -51,8 +35,9 @@ namespace ICAP_Playwright.Tests
             await page1.GetByRole(AriaRole.Button, new() { Name = "Next" }).ClickAsync();
             await page1.GetByPlaceholder("Password").FillAsync(_password);
             await page1.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
-            var buttonLocator = Page.Locator("button:text('Ask later')");
-            if (await buttonLocator.IsVisibleAsync()) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
+            await page1.WaitForLoadStateAsync();
+            var buttonIsVisible = await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).IsVisibleAsync();
+            if (buttonIsVisible) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
             await page1.RunAndWaitForRequestFinishedAsync(async () =>
             {
                 await page1.GetByRole(AriaRole.Button, new() { Name = "No" }).ClickAsync();
@@ -82,8 +67,9 @@ namespace ICAP_Playwright.Tests
             await page1.GetByRole(AriaRole.Button, new() { Name = "Next" }).ClickAsync();
             await page1.GetByPlaceholder("Password").FillAsync(_password);
             await page1.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
-            var buttonLocator = Page.Locator("button:text('Ask later')");
-            if (await buttonLocator.IsVisibleAsync()) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
+            await page1.WaitForLoadStateAsync();
+            var buttonIsVisible = await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).IsVisibleAsync();
+            if (buttonIsVisible) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
             await page1.RunAndWaitForRequestFinishedAsync(async () =>
             {
                 await page1.GetByRole(AriaRole.Button, new() { Name = "No" }).ClickAsync();
