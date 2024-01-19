@@ -143,8 +143,7 @@ jobs:
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
         ClientId: ${{ secrets.ENTRA_CLIENT_ID }}
         TenantId: ${{ secrets.ENTRA_TENANT_ID }}
-        Scopes: 
-          - ${{ secrets.API_SCOPE_1 }}
+        Scopes: ${{ secrets.API_SCOPES }}
         AzureServiceBus: ${{ secrets.AZ_SB }}
 
   run-unit-tests:
@@ -193,7 +192,7 @@ jobs:
         run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
   
   deploy-client:
-    needs: [filter, build-and-test]
+    needs: [filter, sonar-scan]
     runs-on: ubuntu-latest
     steps: 
     - uses: actions/checkout@v4

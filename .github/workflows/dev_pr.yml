@@ -199,7 +199,7 @@ jobs:
         run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
   
   deploy-client:
-    needs: [filter, build-and-test]
+    needs: [filter, sonar-scan]
     runs-on: ubuntu-latest
     steps: 
     - uses: actions/checkout@v4
