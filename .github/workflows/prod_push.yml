@@ -117,7 +117,7 @@ jobs:
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
         ClientId: ${{ secrets.ENTRA_CLIENT_ID }}
         TenantId: ${{ secrets.ENTRA_TENANT_ID }}
-        Scopes: ${{ secrets.API_SCOPES }}
+        Scope: ${{ secrets.API_SCOPE_1 }}
         AzureServiceBus: ${{ secrets.AZ_SB }}
     - name: Run Tests
       run: |
@@ -130,7 +130,7 @@ jobs:
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
         ClientId: ${{ secrets.ENTRA_CLIENT_ID }}
         TenantId: ${{ secrets.ENTRA_TENANT_ID }}
-        Scopes: ${{ secrets.API_SCOPES }}
+        Scope: ${{ secrets.API_SCOPE_1 }}
         AzureServiceBus: ${{ secrets.AZ_SB }}
 
   run-unit-tests:
