@@ -47,7 +47,9 @@ jobs:
           ICAP_ServiceBus:
             - 'srcs/ICAP_ServiceBus/**'     
 
-  test-projects:
+
+  sonar-scan:
+    name: Sonarcloud Scan
     needs: filter
     runs-on: ubuntu-latest
     strategy:
@@ -56,7 +58,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       if: needs.filter.outputs[matrix.services] == 'true'
-    - name: Setup .NET Core
+    - name: Setup .NET
       if: needs.filter.outputs[matrix.services] == 'true'
       uses: actions/setup-dotnet@v3
       with:
@@ -66,8 +68,7 @@ jobs:
       run: |
         cd ./srcs/${{ matrix.services }}
         dotnet build $(ls *.csproj)
-
-    - name: SonarCloud Scan
+    - name: Execute Scans
       if: needs.filter.outputs[matrix.services] == 'true'
       uses: highbyte/sonarscan-dotnet@v2.3.0
       with:
@@ -83,8 +84,70 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
+  run-e2e-tests:
+    name: Playwright E2E Tests
+    needs: filter
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+    - name: Build Test Project
+      run: |
+        cd ./srcs/ICAP_Playwright.Tests
+        dotnet build $(ls *.csproj)
+    - name: Ensure browsers are installed
+      run: pwsh ./srcs/ICAP_Playwright.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
+    - name: Run Tests
+      run: |
+        cd ./srcs/ICAP_Playwright.Tests
+        dotnet test $(ls *.csproj)
+    
+  run-integration-tests:
+    name: SpecFlow Integration Tests
+    needs: filter
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+    - name: Build Test Project
+      run: |
+        cd ./srcs/ICAP_AccountService.Specs
+        dotnet build $(ls *.csproj)
+    - name: Run Tests
+      run: |
+        cd ./srcs/ICAP_AccountService.Specs
+        dotnet test $(ls *.csproj)
+
+
+  run-unit-tests:
+    name: XUnit Unit Tests
+    needs: filter
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+    - name: Build Test Project
+      run: |
+        cd ./srcs/ICAP_MarketService.Tests
+        dotnet build $(ls *.csproj)
+    - name: Run Tests
+      run: |
+        cd ./srcs/ICAP_MarketService.Tests
+        dotnet test $(ls *.csproj)
+
+
   build-images:
-    needs: [filter, test-projects]
+    needs: [filter, sonar-scan]
     permissions:
       contents: read
       id-token: write
@@ -107,9 +170,10 @@ jobs:
         if: needs.filter.outputs[matrix.services] == 'true'
         run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
   
+
   build-client:
     runs-on: windows-latest
-    needs: [filter, test-projects]
+    needs: [filter, sonar-scan]
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET SDK
@@ -136,6 +200,7 @@ jobs:
         name: ICAP-Client
         path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
+
   deploy-client:
     needs: [filter, build-client]
     runs-on: windows-latest
@@ -153,6 +218,7 @@ jobs:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.ICAPClient20240116120037_5205 }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
 
   deploy-services: 
     needs: [filter, build-images]
@@ -201,3 +267,14 @@ jobs:
             ./srcs/${{ matrix.services }}/manifests/ingress.yaml
             ./srcs/${{ matrix.services }}/manifests/secretprovider.yaml
           namespace: default
+
+  stackhawk-hawkscan-services:
+    name: Post-deploy Security Scan
+    needs: [deploy-services]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: stackhawk/hawkscan-action@v2.1.2
+      with:
+        apiKey: ${{ secrets.HAWK_API_KEY }}
+        configurationFiles: stackhawk-accounts.yml stackhawk-market.yml stackhawk-relations.yml

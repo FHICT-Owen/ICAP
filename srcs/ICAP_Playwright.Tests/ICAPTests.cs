@@ -21,10 +21,19 @@ namespace ICAP_Playwright.Tests
                 projectRootPath = Directory.GetParent(projectRootPath)?.FullName;
             }
 
-            var json = File.ReadAllText(Path.Combine(projectRootPath, "appsettings.json"));
-            var configuration = JObject.Parse(json);
-            _email = configuration["Username"]?.ToString() ?? throw new ArgumentNullException();
-            _password = configuration["Password"]?.ToString() ?? throw new ArgumentNullException();
+            var filePath = Path.Combine(projectRootPath, "appsettings.json");
+            try
+            {
+                var json = File.ReadAllText(filePath);
+                var configuration = JObject.Parse(json);
+                _email = configuration["Username"]?.ToString() ?? throw new ArgumentNullException();
+                _password = configuration["Password"]?.ToString() ?? throw new ArgumentNullException();
+            }
+            catch (Exception)
+            {
+                _email = Environment.GetEnvironmentVariable("Username") ?? throw new ArgumentNullException();
+                _password = Environment.GetEnvironmentVariable("Password") ?? throw new ArgumentNullException();
+            }
             await Page.GotoAsync("https://icap.odb-tech.com/");
             await Page.WaitForSelectorAsync("header");
         }

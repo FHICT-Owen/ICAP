@@ -33,6 +33,7 @@ namespace ICAP_AccountService.Specs.Hooks
                         builder.ConfigureAppConfiguration((_, config) =>
                         {
                             config.AddUserSecrets<Program>();
+                            config.AddEnvironmentVariables();
                             config.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), AppSettingsFile));
                         });
                         builder.ConfigureTestServices(services =>
