@@ -122,8 +122,8 @@ jobs:
         AzureServiceBus: ${{ secrets.AZ_SB }}
     - name: Run Tests
       run: |
-        cd ./srcs/ICAP_AccountService.Specs --configuration Debug
-        dotnet test $(ls *.csproj)
+        cd ./srcs/ICAP_AccountService.Specs
+        dotnet test $(ls *.csproj) --configuration Debug
       env:
         MongoTestDatabaseName: "ICAP-Test"
         MongoTestConnectionString: ${{ secrets.MONGO_TEST_CONNECTION_STRING }}
