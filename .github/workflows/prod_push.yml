@@ -98,10 +98,9 @@ jobs:
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
     - name: Ensure browsers are installed
-      run: pwsh ./srcs/ICAP_Playwright.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
+      run: pwsh bin/Debug/net8.0/playwright.ps1 install --with-deps
     - name: Run Tests
       run: |
-        cd ./srcs/ICAP_Playwright.Tests
         dotnet test $(ls *.csproj)
       env:
         ASPNETCORE_ENVIRONMENT: Development
