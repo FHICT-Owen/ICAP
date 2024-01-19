@@ -92,7 +92,7 @@ jobs:
     - name: Build Test Project
       run: |
         cd ./srcs/ICAP_Playwright.Tests
-        dotnet build $(ls *.csproj)
+        dotnet build $(ls *.csproj) --configuration Debug
       env:
         ASPNETCORE_ENVIRONMENT: Development
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
@@ -101,6 +101,7 @@ jobs:
       run: pwsh ./bin/Debug/net8.0/playwright.ps1 install --with-deps
     - name: Run Tests
       run: |
+        cd ./srcs/ICAP_Playwright.Tests
         dotnet test $(ls *.csproj)
       env:
         ASPNETCORE_ENVIRONMENT: Development
@@ -119,7 +120,7 @@ jobs:
         dotnet-version: '8.0.x'
     - name: Build Test Project
       run: |
-        cd ./srcs/ICAP_AccountService.Specs
+        cd ./srcs/ICAP_AccountService.Specs --configuration Debug
         dotnet build $(ls *.csproj)
       env:
         ASPNETCORE_ENVIRONMENT: Development

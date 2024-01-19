@@ -101,6 +101,7 @@ jobs:
       run: pwsh ./srcs/ICAP_Playwright.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
     - name: Run Tests
       run: |
+        cd ./srcs/ICAP_Playwright.Tests
         dotnet test $(ls *.csproj)
       env:
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
