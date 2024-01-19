@@ -51,8 +51,9 @@ namespace ICAP_Playwright.Tests
             await page1.GetByRole(AriaRole.Button, new() { Name = "Next" }).ClickAsync();
             await page1.GetByPlaceholder("Password").FillAsync(_password);
             await page1.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
-            var buttonLocator = Page.Locator("button:text('Ask later')");
-            if (await buttonLocator.IsVisibleAsync()) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
+            await page1.WaitForLoadStateAsync();
+            var buttonIsVisible = await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).IsVisibleAsync();
+            if (buttonIsVisible) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
             await page1.RunAndWaitForRequestFinishedAsync(async () =>
             {
                 await page1.GetByRole(AriaRole.Button, new() { Name = "No" }).ClickAsync();
@@ -82,8 +83,9 @@ namespace ICAP_Playwright.Tests
             await page1.GetByRole(AriaRole.Button, new() { Name = "Next" }).ClickAsync();
             await page1.GetByPlaceholder("Password").FillAsync(_password);
             await page1.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
-            var buttonLocator = Page.Locator("button:text('Ask later')");
-            if (await buttonLocator.IsVisibleAsync()) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
+            await page1.WaitForLoadStateAsync();
+            var buttonIsVisible = await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).IsVisibleAsync();
+            if (buttonIsVisible) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
             await page1.RunAndWaitForRequestFinishedAsync(async () =>
             {
                 await page1.GetByRole(AriaRole.Button, new() { Name = "No" }).ClickAsync();
