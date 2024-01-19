@@ -48,7 +48,7 @@ jobs:
             - 'srcs/ICAP_ServiceBus/**'     
 
 
-   sonar-scan:
+  sonar-scan:
     name: Sonarcloud Scan
     needs: filter
     runs-on: ubuntu-latest
