@@ -108,10 +108,9 @@ jobs:
         dotnet-version: '8.0.x'
     - name: Build Test Project
       run: |
-        cd ./srcs/ICAP_AccountService.Specs --configuration Debug
-        dotnet build $(ls *.csproj)
+        cd ./srcs/ICAP_AccountService.Specs
+        dotnet build $(ls *.csproj) --configuration Debug
       env:
-        ASPNETCORE_ENVIRONMENT: Development
         MongoTestDatabaseName: "ICAP-Test"
         MongoTestConnectionString: ${{ secrets.MONGO_TEST_CONNECTION_STRING }}
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
@@ -123,9 +122,8 @@ jobs:
     - name: Run Tests
       run: |
         cd ./srcs/ICAP_AccountService.Specs
-        dotnet test $(ls *.csproj)
+        dotnet test $(ls *.csproj) --configuration Debug
       env:
-        ASPNETCORE_ENVIRONMENT: Development
         MongoTestDatabaseName: "ICAP-Test"
         MongoTestConnectionString: ${{ secrets.MONGO_TEST_CONNECTION_STRING }}
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
