@@ -48,7 +48,7 @@ jobs:
             - 'srcs/ICAP_ServiceBus/**'     
 
 
-  sonar-scan:
+   sonar-scan:
     name: Sonarcloud Scan
     needs: filter
     runs-on: ubuntu-latest
@@ -99,13 +99,21 @@ jobs:
       run: |
         cd ./srcs/ICAP_Playwright.Tests
         dotnet build $(ls *.csproj)
+      env:
+        ASPNETCORE_ENVIRONMENT: Development
+        Username: ${{ secrets.TESTACCOUNT_USERNAME }}
+        Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
     - name: Ensure browsers are installed
       run: pwsh ./srcs/ICAP_Playwright.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
     - name: Run Tests
       run: |
         cd ./srcs/ICAP_Playwright.Tests
         dotnet test $(ls *.csproj)
-    
+      env:
+        ASPNETCORE_ENVIRONMENT: Development
+        Username: ${{ secrets.TESTACCOUNT_USERNAME }}
+        Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
+
   run-integration-tests:
     name: SpecFlow Integration Tests
     needs: filter
@@ -120,11 +128,31 @@ jobs:
       run: |
         cd ./srcs/ICAP_AccountService.Specs
         dotnet build $(ls *.csproj)
+      env:
+        ASPNETCORE_ENVIRONMENT: Development
+        MongoTestDatabaseName: "ICAP-Test"
+        MongoTestConnectionString: ${{ secrets.MONGO_TEST_CONNECTION_STRING }}
+        Username: ${{ secrets.TESTACCOUNT_USERNAME }}
+        Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
+        ClientId: ${{ secrets.ENTRA_CLIENT_ID }}
+        TenantId: ${{ secrets.ENTRA_TENANT_ID }}
+        Scopes: ${{ secrets.API_SCOPES }}
+        AzureServiceBus: ${{ secrets.AZ_SB }}
     - name: Run Tests
       run: |
         cd ./srcs/ICAP_AccountService.Specs
         dotnet test $(ls *.csproj)
-
+      env:
+        ASPNETCORE_ENVIRONMENT: Development
+        MongoTestDatabaseName: "ICAP-Test"
+        MongoTestConnectionString: ${{ secrets.MONGO_TEST_CONNECTION_STRING }}
+        Username: ${{ secrets.TESTACCOUNT_USERNAME }}
+        Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
+        ClientId: ${{ secrets.ENTRA_CLIENT_ID }}
+        TenantId: ${{ secrets.ENTRA_TENANT_ID }}
+        Scopes: 
+          - ${{ secrets.API_SCOPE_1 }}
+        AzureServiceBus: ${{ secrets.AZ_SB }}
 
   run-unit-tests:
     name: XUnit Unit Tests
@@ -147,6 +175,7 @@ jobs:
 
 
   build-images:
+    name: Build Service Images
     needs: [filter, sonar-scan]
     permissions:
       contents: read
@@ -170,57 +199,30 @@ jobs:
         if: needs.filter.outputs[matrix.services] == 'true'
         run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
   
-
-  build-client:
-    runs-on: windows-latest
-    needs: [filter, sonar-scan]
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      with:
-        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-    - name: Restore
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      run: dotnet restore "${{ env.CLIENT_WORKING_DIRECTORY }}"
-    - name: Build
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      run: dotnet build "${{ env.CLIENT_WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
-    - name: Test
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      run: dotnet test "${{ env.CLIENT_WORKING_DIRECTORY }}" --no-build
-    - name: Publish
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      run: dotnet publish "${{ env.CLIENT_WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
-    - name: Publish Artifacts
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      uses: actions/upload-artifact@v3
-      with:
-        name: ICAP-Client
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-
-
   deploy-client:
-    needs: [filter, build-client]
-    runs-on: windows-latest
-    steps:
-    - name: Download artifact from build job
+    needs: [filter, build-and-test]
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v4
       if: needs.filter.outputs.ICAP_Client == 'true'
-      uses: actions/download-artifact@v3
       with:
-        name: ICAP-Client
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-    - name: Deploy to Azure WebApp
+        submodules: true
+        lfs: false
+    - name: Build And Deploy
       if: needs.filter.outputs.ICAP_Client == 'true'
-      uses: azure/webapps-deploy@v2
+      id: builddeploy
+      uses: Azure/static-web-apps-deploy@v1
       with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.ICAPClient20240116120037_5205 }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_BLACK_POND_0F8DDE003  }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "/srcs/ICAP_Client"
+        api_location: ""
+        output_location: "wwwroot"
 
 
-  deploy-services: 
+  deploy-services:
+    name: Deploy Services To AKS
     needs: [filter, build-images]
     permissions:
       actions: read

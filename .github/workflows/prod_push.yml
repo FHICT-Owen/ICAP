@@ -14,11 +14,6 @@ env:
     AZURE_CONTAINER_REGISTRY: icapacr
     CLUSTER_NAME: ICAP_AKS
     CLUSTER_RESOURCE_GROUP: ICAP
-    AZURE_WEBAPP_NAME: ICAPClient20240116120037
-    AZURE_WEBAPP_PACKAGE_PATH: ICAP_Client\published
-    CONFIGURATION: Release
-    DOTNET_CORE_VERSION: 8.0.x
-    CLIENT_WORKING_DIRECTORY: ./srcs/ICAP_Client/
 
 jobs:
   filter:
@@ -198,56 +193,26 @@ jobs:
         if: needs.filter.outputs[matrix.services] == 'true'
         run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
   
-
-  build-client:
-    name: Build Client
-    runs-on: windows-latest
-    needs: [filter, sonar-scan]
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      with:
-        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-    - name: Restore
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      run: dotnet restore "${{ env.CLIENT_WORKING_DIRECTORY }}"
-    - name: Build
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      run: dotnet build "${{ env.CLIENT_WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
-    - name: Test
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      run: dotnet test "${{ env.CLIENT_WORKING_DIRECTORY }}" --no-build
-    - name: Publish
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      run: dotnet publish "${{ env.CLIENT_WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
-    - name: Publish Artifacts
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      uses: actions/upload-artifact@v3
-      with:
-        name: ICAP-Client
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-
-
   deploy-client:
-    name: Deploy Client To Azure
-    needs: [filter, build-client]
-    runs-on: windows-latest
-    steps:
-    - name: Download artifact from build job
+    needs: [filter, build-and-test]
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v4
       if: needs.filter.outputs.ICAP_Client == 'true'
-      uses: actions/download-artifact@v3
       with:
-        name: ICAP-Client
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-    - name: Deploy to Azure WebApp
+        submodules: true
+        lfs: false
+    - name: Build And Deploy
       if: needs.filter.outputs.ICAP_Client == 'true'
-      uses: azure/webapps-deploy@v2
+      id: builddeploy
+      uses: Azure/static-web-apps-deploy@v1
       with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.ICAPClient20240116120037_5205 }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_BLACK_POND_0F8DDE003  }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "/srcs/ICAP_Client"
+        api_location: ""
+        output_location: "wwwroot"
 
 
   deploy-services:
