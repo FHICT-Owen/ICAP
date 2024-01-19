@@ -166,5 +166,101 @@ And the results of the tests look like this in the Test UI from Visual Studio:
 The Add Account feature in particular I am very proud of because it is an endpoint that requires an access token in order to be able to add a new account. I do this programmatically through the MSAL Library provided by Microsoft.
 
 ## End-to-End Tests (E2E)
+For E2E tests I chose to go with the .NET version of PlayWright that integrates directly with NUnit. PlayWright allows users to easily write and generate E2E tests with their codegen tool or the provided documentation. Using PlayWright, I wrote 2 tests, one for acquiring an access token after logging in and then back out, and the other one for logging in and then deleting the user's data. The tests were written as follows:
+
+```csharp
+private string _email;
+private string _password;
+
+[SetUp]
+public async Task SetupTests()
+{
+    var projectRootPath = Directory.GetCurrentDirectory();
+    while (projectRootPath != null && !Directory.EnumerateFiles(projectRootPath, "*.csproj", SearchOption.TopDirectoryOnly).Any())
+    {
+        projectRootPath = Directory.GetParent(projectRootPath)?.FullName;
+    }
+
+    var json = File.ReadAllText(Path.Combine(projectRootPath, "appsettings.json"));
+    var configuration = JObject.Parse(json);
+    _email = configuration["Username"]?.ToString() ?? throw new ArgumentNullException();
+    _password = configuration["Password"]?.ToString() ?? throw new ArgumentNullException();
+    await Page.GotoAsync("https://icap.odb-tech.com/");
+    await Page.WaitForSelectorAsync("header");
+}
+
+[Test]
+public async Task LogInAndGetAccessTokenAndLogOut()
+{
+    await Expect(Page.GetByRole(AriaRole.Banner)).ToContainTextAsync("Log In");
+    var page1 = await Page.RunAndWaitForPopupAsync(async () =>
+    {
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Log In" }).ClickAsync();
+    });
+    await page1.GetByPlaceholder("Email, phone, or Skype").FillAsync(_email);
+    await page1.GetByPlaceholder("Email, phone, or Skype").ClickAsync();
+    await page1.GetByRole(AriaRole.Button, new() { Name = "Next" }).ClickAsync();
+    await page1.GetByPlaceholder("Password").FillAsync(_password);
+    await page1.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
+    var buttonLocator = Page.Locator("button:text('Ask later')");
+    if (await buttonLocator.IsVisibleAsync()) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
+    await page1.RunAndWaitForRequestFinishedAsync(async () =>
+    {
+        await page1.GetByRole(AriaRole.Button, new() { Name = "No" }).ClickAsync();
+    });
+    await Expect(Page.GetByRole(AriaRole.Banner)).ToContainTextAsync("Log Out");
+    await Page.GotoAsync("https://icap.odb-tech.com/user");
+    var elementLocator = Page.Locator("#access-token");
+    await elementLocator.WaitForAsync();
+	var token = await elementLocator.TextContentAsync();
+    await Page.GetByRole(AriaRole.Button, new() { Name = "Log Out" }).ClickAsync();
+    await Page.Locator("[data-test-id=\"testaccount\\@owendebreetjes\\.onmicrosoft\\.com\"]").ClickAsync();
+    await Page.GotoAsync("https://icap.odb-tech.com/");
+    await Expect(Page.GetByRole(AriaRole.Banner)).ToContainTextAsync("Log In");
+    Console.WriteLine("Access Token: " + token);
+}
+
+[Test]
+public async Task LogInAndClickDeleteAccountData()
+{
+    await Expect(Page.GetByRole(AriaRole.Banner)).ToContainTextAsync("Log In");
+    var page1 = await Page.RunAndWaitForPopupAsync(async () =>
+    {
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Log In" }).ClickAsync();
+    });
+    await page1.GetByPlaceholder("Email, phone, or Skype").FillAsync(_email);
+    await page1.GetByPlaceholder("Email, phone, or Skype").ClickAsync();
+    await page1.GetByRole(AriaRole.Button, new() { Name = "Next" }).ClickAsync();
+    await page1.GetByPlaceholder("Password").FillAsync(_password);
+    await page1.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
+    var buttonLocator = Page.Locator("button:text('Ask later')");
+    if (await buttonLocator.IsVisibleAsync()) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
+    await page1.RunAndWaitForRequestFinishedAsync(async () =>
+    {
+        await page1.GetByRole(AriaRole.Button, new() { Name = "No" }).ClickAsync();
+    });
+    await Expect(Page.GetByRole(AriaRole.Banner)).ToContainTextAsync("Log Out");
+    await Page.GotoAsync("https://icap.odb-tech.com/user");
+    await Page.RunAndWaitForRequestFinishedAsync(async () =>
+    {
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Delete" }).ClickAsync();
+    });
+    await Page.Locator("[data-test-id=\"testaccount\\@owendebreetjes\\.onmicrosoft\\.com\"]").ClickAsync();
+    await Page.GotoAsync("https://icap.odb-tech.com/");
+    await Expect(Page.GetByRole(AriaRole.Banner)).ToContainTextAsync("Log In");
+}
+```
+
+The results from the test setup shown above are shown below, including the Access token that is printed out during the test for acquiring the access token. 
+
+![Alt text](./Media/E2ETests_Result.png)
 
 ## Load Testing
+For load testing I decided to create a load test using Azure Load Testing that hit a get endpoint on each of my services. This test consists of the following requests:
+- GET: https://aks.odb-tech.com/accounts/users
+- GET: https://aks.odb-tech.com/market/listings
+- GET: https://aks.odb-tech.com/relations/friendrequests
+
+The test is set up to run on with 250 users per engine and a total of 6 engines at once. The stress test duration is 5 minutes with 1 minute of ramp up time. I made this test to verify that the Horizontal Pod Autoscaler will scale up pods when pods hit more than 10 requests per second per pod. Below is a video of how the pods scale up very agressively with the current Autoscaler and deployment settings. 
+
+<video src="./Media/2024-01-18 06-15-20.mp4" width="800" controls></video>

@@ -1,0 +1,8 @@
+app:
+  applicationId: 6846cd02-b8e4-4638-8ba4-6a51b2a71f2a
+  env: Pre-Production
+  host: https://aks.odb-tech.com
+  openApiConf:
+    path: /market/swagger/v1/swagger.json
+  autoPolicy: true
+  autoInputVectors: true

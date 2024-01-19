@@ -23,6 +23,11 @@ spec:
         - name: secrets-store-accountservice
           mountPath: "/mnt/secrets-store"
           readOnly: true
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
       volumes:
       - name: secrets-store-accountservice
         csi:
