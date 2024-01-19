@@ -1,6 +1,6 @@
-﻿using ICAP_AccountService.Entities;
+﻿using DotNetEnv;
+using ICAP_AccountService.Entities;
 using ICAP_Infrastructure.Repositories;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ICAP_AccountService.Specs.Hooks
 {
@@ -14,8 +14,6 @@ namespace ICAP_AccountService.Specs.Hooks
         [Binding]
         public class AccountServiceHooks(IObjectContainer objectContainer)
         {
-            public const string AppSettingsFile = "appsettings.json";
-
             [BeforeScenario]
             public async Task RegisterServices()
             {
@@ -34,7 +32,7 @@ namespace ICAP_AccountService.Specs.Hooks
                         {
                             config.AddUserSecrets<Program>();
                             config.AddEnvironmentVariables();
-                            config.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), AppSettingsFile));
+                            Env.TraversePath().Load();
                         });
                         builder.ConfigureTestServices(services =>
                         {
