@@ -257,4 +257,4 @@ jobs:
     - uses: stackhawk/hawkscan-action@v2.1.2
       with:
         apiKey: ${{ secrets.HAWK_API_KEY }}
-        configurationFiles: ./stackhawk/stackhawk-accounts.yml ./stackhawk/stackhawk-market.yml ./stackhawk/stackhawk-relations.yml
+        configurationFiles: ./stackhawk/stackhawk-accounts.yml, ./stackhawk/stackhawk-market.yml, ./stackhawk/stackhawk-relations.yml
