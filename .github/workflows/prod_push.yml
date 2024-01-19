@@ -1,6 +1,3 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: Merge into Production
 
 on:
@@ -9,11 +6,6 @@ on:
     paths:
       - "srcs/**"
   workflow_dispatch:
-env:
-    ACR_RESOURCE_GROUP: ICAP
-    AZURE_CONTAINER_REGISTRY: icapacr
-    CLUSTER_NAME: ICAP_AKS
-    CLUSTER_RESOURCE_GROUP: ICAP
 
 jobs:
   filter:
@@ -40,7 +32,6 @@ jobs:
             - 'srcs/ICAP_RelationService/**'
           ICAP_ServiceBus:
             - 'srcs/ICAP_ServiceBus/**'     
-
 
   sonar-scan:
     name: Sonarcloud Scan
@@ -78,7 +69,6 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
   run-e2e-tests:
     name: Playwright E2E Tests
     needs: filter
@@ -94,17 +84,15 @@ jobs:
         cd ./srcs/ICAP_Playwright.Tests
         dotnet build $(ls *.csproj) --configuration Debug
       env:
-        ASPNETCORE_ENVIRONMENT: Development
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
     - name: Ensure browsers are installed
-      run: pwsh ./bin/Debug/net8.0/playwright.ps1 install --with-deps
+      run: pwsh ./srcs/ICAP_Playwright.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
     - name: Run Tests
       run: |
         cd ./srcs/ICAP_Playwright.Tests
         dotnet test $(ls *.csproj)
       env:
-        ASPNETCORE_ENVIRONMENT: Development
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
 
@@ -166,7 +154,6 @@ jobs:
         cd ./srcs/ICAP_MarketService.Tests
         dotnet test $(ls *.csproj)
 
-
   build-images:
     name: Build Service Images
     needs: [filter, sonar-scan]
@@ -190,8 +177,8 @@ jobs:
           echo "CONVERTED_IMAGE=$(echo '${{ matrix.services }}' | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_ENV
       - name: Build and push image to ACR
         if: needs.filter.outputs[matrix.services] == 'true'
-        run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
-  
+        run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry icapacr -g ICAP -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
+
   deploy-client:
     needs: [filter, sonar-scan]
     runs-on: ubuntu-latest
@@ -212,7 +199,6 @@ jobs:
         app_location: "/srcs/ICAP_Client"
         api_location: ""
         output_location: "wwwroot"
-
 
   deploy-services:
     name: Deploy Services To AKS
@@ -243,8 +229,8 @@ jobs:
         name: Get K8s context
         with:
           admin: "false"
-          cluster-name: ${{ env.CLUSTER_NAME }}
-          resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+          cluster-name: ICAP_AKS
+          resource-group: ICAP
           use-kubelogin: "true"
       - name: Create ENV for name container image
         run: |
@@ -254,7 +240,7 @@ jobs:
         name: Deploys application
         with:
           action: deploy
-          images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONVERTED_IMAGE }}:${{ github.sha }}
+          images: icapacr.azurecr.io/${{ env.CONVERTED_IMAGE }}:${{ github.sha }}
           manifests: |
             ./srcs/${{ matrix.services }}/manifests/deployment.yaml
             ./srcs/${{ matrix.services }}/manifests/service.yaml
