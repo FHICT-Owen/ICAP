@@ -15,11 +15,6 @@ env:
     AZURE_CONTAINER_REGISTRY: icapacr
     CLUSTER_NAME: ICAP_AKS
     CLUSTER_RESOURCE_GROUP: ICAP
-    AZURE_WEBAPP_NAME: ICAPClient20240116120037
-    AZURE_WEBAPP_PACKAGE_PATH: ICAP_Client\published
-    CONFIGURATION: Release
-    DOTNET_CORE_VERSION: 8.0.x
-    CLIENT_WORKING_DIRECTORY: ./srcs/ICAP_Client/
 
 jobs:
   filter:
@@ -98,20 +93,16 @@ jobs:
     - name: Build Test Project
       run: |
         cd ./srcs/ICAP_Playwright.Tests
-        dotnet build $(ls *.csproj)
+        dotnet build $(ls *.csproj) --configuration Debug
       env:
-        ASPNETCORE_ENVIRONMENT: Development
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
     - name: Ensure browsers are installed
-      run: |
-        ls ./srcs/ICAP_Playwright.Tests/bin
-        pwsh ./srcs/ICAP_Playwright.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
+      run: pwsh ./srcs/ICAP_Playwright.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
     - name: Run Tests
       run: |
         dotnet test $(ls *.csproj)
       env:
-        ASPNETCORE_ENVIRONMENT: Development
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
 
@@ -127,7 +118,7 @@ jobs:
         dotnet-version: '8.0.x'
     - name: Build Test Project
       run: |
-        cd ./srcs/ICAP_AccountService.Specs
+        cd ./srcs/ICAP_AccountService.Specs --configuration Debug
         dotnet build $(ls *.csproj)
       env:
         ASPNETCORE_ENVIRONMENT: Development
