@@ -4,7 +4,7 @@
 @inject NavigationManager Navigation
 @inject IAccessTokenProvider AuthorizationService
 @inject AccountServiceClient AccountServiceClient
-
+@inject HttpClient Client
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -44,8 +44,6 @@
     void LogOut() => Navigation.NavigateToLogout("/authentication/logout");
     void LogIn() => Navigation.NavigateToLogin("/authentication/login");
 
-    public HttpClient Client;
-
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -62,8 +60,9 @@
             {
                 Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Value);
                 await AccountServiceClient.SendUserDataAsync();
+                await Task.Delay(30000); // 30 second delay
             }
-            await Task.Delay(30000); // 30 second delay
+            await Task.Delay(500); // 500 ms delay
         }        
     }
 }

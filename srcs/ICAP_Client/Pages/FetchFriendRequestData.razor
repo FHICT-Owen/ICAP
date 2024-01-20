@@ -1,0 +1,65 @@
+﻿@page "/friendrequests"
+@using ICAP_Client.Dtos
+@using ICAP_Client.RESTClients
+@attribute [Authorize]
+@inject RelationServiceClient Client
+@inject ISnackbar Snackbar
+
+<PageTitle>Friend Requests</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Friend Requests<</MudText>
+<MudText Class="mb-8">This component demonstrates friendrequests that are specifically for your user.</MudText>
+
+<div class="btn-group ma-2">
+    <MudTextField Label="User ID" @bind-Value="_userTo" Class="d-inline-flex" />
+    <MudButton Variant="Variant.Filled" Color="Color.Success" Class="d-inline-flex" OnClick="@(async () => await CreateListing())">Add New Listing</MudButton>
+</div>
+
+@if (_requests == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudExpansionPanels>
+        <MudTable Items="_requests" Hover="true" SortLabel="Sort By" Elevation="0">
+            <HeaderContent>
+                <MudTh>Dummy Friend Requests</MudTh>
+            </HeaderContent>
+
+            <RowTemplate>
+                <MudExpansionPanel Text=@context.UserTo>
+                    @context
+                </MudExpansionPanel>
+            </RowTemplate>
+        </MudTable>
+    </MudExpansionPanels>
+}
+
+
+@code {
+    private List<FriendRequestDto>? _requests;
+    private string? _userTo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _requests = await Client.GetFriendRequestsAsync();
+        if (_requests == null) Snackbar.Add("Failed to retrieve listings", Severity.Error);
+    }
+
+    private async Task CreateListing()
+    {
+        if(_userTo == null)
+        {
+            Snackbar.Add("Please fill in a userId you'd like to send the request to", Severity.Error);
+            return;
+        }
+        var result = await Client.AddNewFriendRequest(new FriendRequestDto("", _userTo, FriendRequestStatus.Pending));
+        if (result)
+        {
+            Snackbar.Add("Successfully added the friend request", Severity.Success);
+            _requests = await Client.GetFriendRequestsAsync();
+        }
+        else Snackbar.Add("Was unable to add the request", Severity.Error);
+    }
+}
