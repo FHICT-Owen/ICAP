@@ -33,12 +33,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowedSpecificOrigins", policy =>
-        policy.WithOrigins("http://localhost",
-                            "https://localhost",
-                            "https://icap.odb-tech.com")
-               .AllowAnyMethod()
-               .AllowAnyHeader());
+    options.AddPolicy("DynamicOriginPolicy", policy =>
+    {
+        policy.SetIsOriginAllowed(origin =>
+            {
+                var uri = new Uri(origin);
+                var allowedHosts = new List<string>
+                {
+                    "localhost",
+                    "icap.odb-tech.com"
+                };
+                return allowedHosts.Any(allowedHost => uri.Host.Equals(allowedHost, StringComparison.OrdinalIgnoreCase));
+            })
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
 });
 
 builder.Services.AddControllers();
@@ -72,7 +81,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors("AllowedSpecificOrigins");
+app.UseCors("DynamicOriginPolicy");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

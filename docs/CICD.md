@@ -1,12 +1,24 @@
-name: Merge into Production
+# CI/CD Analysis
+In this document I'll give a detailed overview of how CI/CD is set up within ICAP.
+
+## Continuous Integration
+Continuous delivery (CI for short) is a software development practice where developers regularly merge their code changes into a central repository, preferably several times a day. Each integration is then verified by an automated build and automated tests. This practice is primarily aimed at detecting and addressing conflicts and issues early in the development cycle.
+
+Within ICAP, CI is implemented by using GitHub actions to both build and test the integration of new code. Whenever a new commit on the development branch is made, the automatic CI pipeline triggers to both build the code and statically analyse it. Sonarcloud is integrated into this part of the CI GitHub actions in order to verify code quality and the ability to build the project.
+
+The GitHub Actions workflow file for pushes being done on the development branch looks like the following:
+
+```yml
+name: PUSH to DEV
 
 on:
   push:
-    branches: "production"
+    branches: "development"
     paths:
       - "srcs/**"
+      - ".github/workflows/**"
   workflow_dispatch:
-
+  
 jobs:
   filter:
     runs-on: ubuntu-latest
@@ -28,10 +40,10 @@ jobs:
           ICAP_MarketService:
             - 'srcs/ICAP_MarketService/**'
           ICAP_RelationService:
-            - 'srcs/ICAP_RelationService/**'  
+            - 'srcs/ICAP_RelationService/**'
+        base: 'development'      
 
-  sonar-scan:
-    name: Sonarcloud Scan
+  build-and-test:
     needs: filter
     runs-on: ubuntu-latest
     strategy:
@@ -39,10 +51,9 @@ jobs:
         services: [ICAP_Client, ICAP_AccountService, ICAP_MarketService, ICAP_RelationService]
     steps:
     - uses: actions/checkout@v4
+    - name: Setup .NET Core
       if: needs.filter.outputs[matrix.services] == 'true'
-    - name: Setup .NET
-      if: needs.filter.outputs[matrix.services] == 'true'
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '8.0.x'
     - name: Build
@@ -50,7 +61,14 @@ jobs:
       run: |
         cd ./srcs/${{ matrix.services }}
         dotnet build $(ls *.csproj)
-    - name: Execute Scans
+
+    - name: Unit Tests
+      if: needs.filter.outputs[matrix.services] == 'true'
+      run: |
+        cd ./srcs/${{ matrix.services }}
+        dotnet test --no-build $(ls *.csproj)
+
+    - name: SonarCloud Scan
       if: needs.filter.outputs[matrix.services] == 'true'
       uses: highbyte/sonarscan-dotnet@v2.3.0
       with:
@@ -62,8 +80,38 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
 
-  run-e2e-tests:
+In this file I make use of a feature in GitHub Actions called a matrix. A GitHub Actions matrix allows the developer to add multiple elements to an array and pass that array to the worker. For each element in the array, the worker will create a new version of that job. The matrix in combination with the first filter action using `dorny/paths-filter@v2` allows me to dynamically test only the projects and/or directories that have changes compared to the last commit made.
+
+I also make use of this matrix and path filter in my deployment workflow and pull request workflow. It allows me to deploy or test the relevant services that have changes in the development branch compared to the production branch. 
+
+Lastly, when both the previously mentioned CI steps and the deployment process finish, I use the job below to run a StackHawk security scan against all endpoints of my application to see if there are any new vulnerabilities. 
+
+```yml
+stackhawk-hawkscan-services:
+    name: Post-deploy Security Scan
+    needs: [deploy-services]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: stackhawk/hawkscan-action@v2.1.2
+      with:
+        apiKey: ${{ secrets.HAWK_API_KEY }}
+        configurationFiles: ./stackhawk/stackhawk-accounts.yml, ./stackhawk/stackhawk-market.yml, ./stackhawk/stackhawk-relations.yml
+```
+
+Which ends up looking something like this on the StackHawk dashboard.
+
+![](./Media/StackHawk.png)
+
+## Continuous Delivery
+Continuous is the act of automatically preparing code changes for release to a production environment. In Continuous Delivery, every code change that passes the automated testing phase in the CI process is automatically built and tested in a staging or production-like environment. This ensures that the code is ready for deployment to production at any time.
+
+Continuous Delivery is achieved within ICAP by having a GitHub Actions workflow that runs specifically when a new pull request is made from the development branch to main. All of the abovementioned CI steps and a few additional testing steps are run and need to be waited on for the pull request to be merged into development. A few more of the CI steps from the pull request specific workflow are shown below.
+
+```yml
+run-e2e-tests:
     name: Playwright E2E Tests
     needs: filter
     runs-on: ubuntu-latest
@@ -145,8 +193,23 @@ jobs:
       run: |
         cd ./srcs/ICAP_MarketService.Tests
         dotnet test $(ls *.csproj)
+```
 
-  build-images:
+These steps run all of the relevant tests for the ICAP project and make it so the PR either fails or passes based on these jobs. In addition to these tests, all of the services or clients with changes will be deployed. The deployment for the client happens in such a way that the cloud service resource that runs the client web app is able to check whether the newly uploaded project comes from the development or production branch. Based on the branch, it loads the project into the production environment or a separate test environment for which it sends a new separate test URL back to the comments of the pull request like in the picture below.
+
+![](./Media/AZ_Web_App.png)
+
+The backend services can also be deployed into a completely different Kubernetes cluster that serves as the staging environment from the pull request workflow. This is currently not being done because of the costs in having to create a completely new hosted cluster that is a carbon copy of the current one. The deployment strategy that this all falls under is blue-green deployment.
+
+## Continuous Deployment
+When all of the tests and deployments for blue-green deployment pass, the merge-request can be closed and merged into the production branch. From the production branch, a workflow file that is very similar to the one for the pull requests is triggered. The workflow once again runs all of the relevant tests, static code analyses and building of projects, after which it will deploy the final results to the production environment. The results of a successfull full CI/CD run look like this in the GitHub Actions overview.
+
+![](./Media/CICD_FULL.png)
+
+I also maintain versioning for my entire cluster by building images that use the GitHub SHA to generate a random token that is then coupled specifically to the images that are uploaded to my Azure Container registry. This can be seen in the job below.
+
+```yml
+build-images:
     name: Build Service Images
     needs: [filter, sonar-scan, run-unit-tests, run-integration-tests]
     permissions:
@@ -170,28 +233,11 @@ jobs:
       - name: Build and push image to ACR
         if: needs.filter.outputs[matrix.services] == 'true'
         run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry icapacr -g ICAP -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
+```
 
-  deploy-client:
-    needs: [filter, sonar-scan, run-e2e-tests]
-    runs-on: ubuntu-latest
-    steps: 
-    - uses: actions/checkout@v4
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      with:
-        submodules: true
-        lfs: false
-    - name: Build And Deploy
-      if: needs.filter.outputs.ICAP_Client == 'true'
-      id: builddeploy
-      uses: Azure/static-web-apps-deploy@v1
-      with:
-        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_BLACK_POND_0F8DDE003  }}
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        action: "upload"
-        app_location: "/srcs/ICAP_Client"
-        api_location: ""
-        output_location: "wwwroot"
+After the images are successfully built, the manifest files are then applied to the AKS service and the image related tags are dynamically overwritten using the job that can be seen below. This makes sure that the new pods are started with the latest possible image of that service.
 
+```yml
   deploy-services:
     name: Deploy Services To AKS
     needs: [filter, build-images]
@@ -240,14 +286,5 @@ jobs:
             ./srcs/${{ matrix.services }}/manifests/ingress.yaml
             ./srcs/${{ matrix.services }}/manifests/secretprovider.yaml
           namespace: default
+```
 
-  stackhawk-hawkscan-services:
-    name: Post-deploy Security Scan
-    needs: [deploy-services]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: stackhawk/hawkscan-action@v2.1.2
-      with:
-        apiKey: ${{ secrets.HAWK_API_KEY }}
-        configurationFiles: ./stackhawk/stackhawk-accounts.yml, ./stackhawk/stackhawk-market.yml, ./stackhawk/stackhawk-relations.yml

@@ -1,0 +1,64 @@
+﻿@page "/listings"
+@using ICAP_Client.Dtos
+@using ICAP_Client.RESTClients
+@using ICAP_Client.DialogModels
+@attribute [Authorize]
+@inject MarketServiceClient Client
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<PageTitle>Market Listings</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Market Listings</MudText>
+<MudText Class="mb-8">This component demonstrates fetching data from the market service.</MudText>
+
+<div class="btn-group ma-2">
+    <MudButton Variant="Variant.Filled" Color="Color.Success" Class="d-inline-flex" OnClick="@(async () => await CreateListing())">Add New Listing</MudButton>
+</div>
+
+@if (_listings == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudExpansionPanels>
+        <MudTable Items="_listings" Hover="true" SortLabel="Sort By" Elevation="0">
+            <HeaderContent>
+                <MudTh>Dummy Market Listings</MudTh>
+            </HeaderContent>
+
+            <RowTemplate>
+                <MudExpansionPanel Text=@context.Title>
+                    @context
+                </MudExpansionPanel>
+            </RowTemplate>
+        </MudTable>
+    </MudExpansionPanels>
+}
+
+
+@code {
+    private List<MarketListingDto>? _listings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _listings = await Client.GetListingsAsync();
+        if (_listings == null) Snackbar.Add("Failed to retrieve listings", Severity.Error);
+    }
+
+    private async Task CreateListing()
+    {
+        var dialog = await DialogService.ShowAsync<MarketListingDialog>("Create new listing");
+        var dialogResult = await dialog.Result;
+        if (dialogResult.Canceled) return;
+        var listing = (MarketListingDto)dialogResult.Data;
+        var result = await Client.AddListingAsync(listing);
+        if (result)
+        {
+            Snackbar.Add("Successfully added new listing", Severity.Success);
+            _listings = await Client.GetListingsAsync();
+        }
+        else Snackbar.Add("Was unable to add new listing", Severity.Error);
+    }
+}

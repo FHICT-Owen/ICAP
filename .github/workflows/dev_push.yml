@@ -19,7 +19,6 @@ jobs:
       ICAP_AccountService: ${{ steps.filter.outputs.ICAP_AccountService }}
       ICAP_MarketService: ${{ steps.filter.outputs.ICAP_MarketService }}
       ICAP_RelationService: ${{ steps.filter.outputs.ICAP_RelationService }}
-      ICAP_ServiceBus: ${{ steps.filter.outputs.ICAP_ServiceBus }}
     steps:
     - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v2
@@ -34,8 +33,6 @@ jobs:
             - 'srcs/ICAP_MarketService/**'
           ICAP_RelationService:
             - 'srcs/ICAP_RelationService/**'
-          ICAP_ServiceBus:
-            - 'srcs/ICAP_ServiceBus/**'
         base: 'development'      
 
   build-and-test:
@@ -67,11 +64,8 @@ jobs:
       if: needs.filter.outputs[matrix.services] == 'true'
       uses: highbyte/sonarscan-dotnet@v2.3.0
       with:
-        # The key of the SonarQube project
         sonarProjectKey: FHICT-Owen_ICAP
-        # The name of the SonarQube project
         sonarProjectName: ICAP
-        # The name of the SonarQube organization in SonarCloud. For hosted SonarQube, skip this setting.
         sonarOrganization: fhict-s-owen
         dotnetBuildArguments: ./srcs/${{ matrix.services }}
         dotnetDisableTests: true

@@ -18,6 +18,8 @@ builder.Services.AddMsalAuthentication(options =>
 });
 
 builder.Services.AddScoped<AccountServiceClient>();
+builder.Services.AddScoped<MarketServiceClient>();
+builder.Services.AddScoped<RelationServiceClient>();
 builder.Services.AddAuthorizationCore();
 
 await builder.Build().RunAsync();

@@ -25,7 +25,7 @@ spec:
           readOnly: true
         resources:
           requests:
-            cpu: 250m
+            cpu: 25m
           limits:
             cpu: 500m
       volumes:
