@@ -1,0 +1,41 @@
+﻿@using ICAP_Client.Dtos
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField Label="Title" @bind-Value="_title" />
+        <MudTextField Label="Description" @bind-Value="_description" Lines="5" />
+        <MudNumericField Label="Price" @bind-Value="_price" />
+        <MudSelect Label="Service Category" T="ServiceCategory" @bind-Value="_category" Required="true" AnchorOrigin="Origin.CenterCenter" TransformOrigin="Origin.CenterCenter">
+            <MudSelectItem Value="ServiceCategory.FullReplicaBuild" />
+            <MudSelectItem Value="ServiceCategory.GearboxUpgrade" />
+        </MudSelect>
+        <MudTextField Label="Link to image" @bind-Value="_imageLink" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Dark" OnClick="Submit">Submit</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private string? _title;
+    private string? _description;
+    private double _price;
+    private ServiceCategory _category;
+    private string? _imageLink;
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void Submit()
+    {
+        try
+        {
+            var newListing = new MarketListingDto(_title, _description, _price, _category, _imageLink);
+            MudDialog.Close(DialogResult.Ok(newListing));
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Not all fields were filled in properly. Please try again.", Severity.Error);
+        }
+    } 
+}

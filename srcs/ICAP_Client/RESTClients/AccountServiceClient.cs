@@ -4,20 +4,16 @@ namespace ICAP_Client.RESTClients
 {
     public class AccountServiceClient(HttpClient httpClient, IConfiguration config)
     {
-        private readonly string _serverUrl = config["ServerUrl"] ?? throw new InvalidOperationException();
+        private readonly string _serviceUrl = config["ServerUrl"] + "/accounts" ?? throw new InvalidOperationException();
 
-        public async Task SendTokenAsync(string token)
+        public async Task SendUserDataAsync()
         {
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            await httpClient.PostAsJsonAsync($"{_serverUrl}/accounts/users", new { });
-            httpClient.DefaultRequestHeaders.Authorization = null;
+            await httpClient.PostAsJsonAsync($"{_serviceUrl}/users", new { });
         }
 
-        public async Task<bool> RemoveUserDataAsync(string token)
+        public async Task<bool> RemoveUserDataAsync()
         {
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await httpClient.DeleteAsync($"{_serverUrl}/accounts/users");
-            httpClient.DefaultRequestHeaders.Authorization = null;
+            var response = await httpClient.DeleteAsync($"{_serviceUrl}/users");
             return response.IsSuccessStatusCode;
         }
     }

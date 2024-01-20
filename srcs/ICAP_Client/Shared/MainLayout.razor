@@ -1,8 +1,10 @@
 ﻿@using ICAP_Client.RESTClients
+@using System.Net.Http.Headers
 @inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject IAccessTokenProvider AuthorizationService
 @inject AccountServiceClient AccountServiceClient
+
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -42,6 +44,8 @@
     void LogOut() => Navigation.NavigateToLogout("/authentication/logout");
     void LogIn() => Navigation.NavigateToLogin("/authentication/login");
 
+    public HttpClient Client;
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -50,18 +54,16 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var tokenAcquired = false;
-        while (!tokenAcquired)
+        while (true)
         {
             var tokenResult = await AuthorizationService.RequestAccessToken();
             if (tokenResult.Status == AccessTokenResultStatus.Success &&
             tokenResult.TryGetToken(out var token))
             {
-                await AccountServiceClient.SendTokenAsync(token.Value);
-                tokenAcquired = true;
+                Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Value);
+                await AccountServiceClient.SendUserDataAsync();
             }
-            else await Task.Delay(10000);
-            Console.WriteLine(tokenAcquired);
+            await Task.Delay(30000); // 30 second delay
         }        
     }
 }
