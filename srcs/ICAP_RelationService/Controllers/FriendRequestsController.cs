@@ -36,9 +36,7 @@ namespace ICAP_RelationService.Controllers
                 Id = Guid.NewGuid().ToString(),
                 UserFrom = data.UserFrom,
                 UserTo = data.UserTo,
-                Accepted = false,
-                Declined = false,
-                Pending = true,
+                RequestStatus = FriendRequestStatus.Pending,
                 CreatedDateTime = DateTimeOffset.Now
             };
 
@@ -51,10 +49,7 @@ namespace ICAP_RelationService.Controllers
         {
             var existingItem = await friendRequestsRepository.GetAsync(id);
             if (existingItem is null) return NotFound();
-            existingItem.Accepted = true;
-            existingItem.Declined = false;
-            existingItem.Pending = false;
-            
+            existingItem.RequestStatus = FriendRequestStatus.Accepted;
             await friendRequestsRepository.UpdateAsync(existingItem);
             return Ok();
         }
@@ -64,9 +59,7 @@ namespace ICAP_RelationService.Controllers
         {
             var existingItem = await friendRequestsRepository.GetAsync(id);
             if (existingItem is null) return NotFound();
-            existingItem.Accepted = false;
-            existingItem.Declined = true;
-            existingItem.Pending = false;
+            existingItem.RequestStatus = FriendRequestStatus.Declined;
             await friendRequestsRepository.UpdateAsync(existingItem);
             return Ok();
         }
