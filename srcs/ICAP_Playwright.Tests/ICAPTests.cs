@@ -19,6 +19,7 @@ namespace ICAP_Playwright.Tests
             _password = Environment.GetEnvironmentVariable("Password") ?? throw new ArgumentNullException();
             
             await Page.GotoAsync("https://icap.odb-tech.com/");
+            await Page.WaitForSelectorAsync("header");
         }
         
         [Test]

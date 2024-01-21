@@ -85,7 +85,7 @@ jobs:
     - name: Run Tests
       run: |
         cd ./srcs/ICAP_Playwright.Tests
-        dotnet test $(ls *.csproj)
+        dotnet test $(ls *.csproj) --configuration Debug
       env:
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
