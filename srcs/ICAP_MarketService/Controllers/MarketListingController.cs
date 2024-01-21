@@ -2,6 +2,7 @@
 using ICAP_MarketService.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,6 +12,7 @@ namespace ICAP_MarketService.Controllers
     public record MarketListingDto(string Title, string Description, double Price, ServiceCategory Category, string ImageLink);
 
     [ApiController]
+    [RequiredScope("access_as_user")]
     [Route("listings")]
     public class MarketListingController(MarketListingCollection listings) : ControllerBase
     {

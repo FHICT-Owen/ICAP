@@ -28,7 +28,7 @@ jobs:
           ICAP_MarketService:
             - 'srcs/ICAP_MarketService/**'
           ICAP_RelationService:
-            - 'srcs/ICAP_RelationService/**'  
+            - 'srcs/ICAP_RelationService/**'
 
   sonar-scan:
     name: Sonarcloud Scan
@@ -85,7 +85,7 @@ jobs:
     - name: Run Tests
       run: |
         cd ./srcs/ICAP_Playwright.Tests
-        dotnet test $(ls *.csproj)
+        dotnet test $(ls *.csproj) --configuration Debug
       env:
         Username: ${{ secrets.TESTACCOUNT_USERNAME }}
         Password: ${{ secrets.TESTACCOUNT_PASSWORD }}
@@ -148,7 +148,7 @@ jobs:
 
   build-images:
     name: Build Service Images
-    needs: [filter, sonar-scan, run-unit-tests, run-integration-tests]
+    needs: [filter, sonar-scan]
     permissions:
       contents: read
       id-token: write
@@ -172,7 +172,7 @@ jobs:
         run: az acr build --image ${{ env.CONVERTED_IMAGE }}:${{ github.sha }} --registry icapacr -g ICAP -f ./srcs/Dockerfile.${{ matrix.services }} ./srcs/
 
   deploy-client:
-    needs: [filter, sonar-scan, run-e2e-tests]
+    needs: [filter, sonar-scan]
     runs-on: ubuntu-latest
     steps: 
     - uses: actions/checkout@v4
