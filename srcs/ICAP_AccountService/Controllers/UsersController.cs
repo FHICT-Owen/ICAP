@@ -14,20 +14,21 @@ namespace ICAP_AccountService.Controllers
     [Route("users")]
     public class UsersController(IRepository<User> usersRepository, IBus bus) : ControllerBase
     {
-        public record UserDto(string Name, string Email);
+        public record UserDto(string UserId, string GivenName, string Email);
 
         [HttpGet]
-        public async Task<IEnumerable<User>> GetAsync()
+        public async Task<IEnumerable<UserDto>> GetAsync()
         {
             var items = await usersRepository.GetAllAsync();
-            return items;
+            return items.Select(users => new UserDto(users.Id, users.Name, ""));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetByIdAsync(string id)
+        public async Task<ActionResult<UserDto>> GetByIdAsync(string id)
         {
             var item = await usersRepository.GetAsync(id);
-            return item;
+            if (item == null) return NotFound();
+            return new UserDto(item.Id, item.Name, "");
         }
 
         [Authorize]
@@ -69,7 +70,7 @@ namespace ICAP_AccountService.Controllers
 
             var existingItem = await usersRepository.GetAsync(oid);
             if (existingItem is null) return NotFound();
-            existingItem.Name = data.Name;
+            existingItem.Name = data.GivenName;
             existingItem.Email = data.Email;
             
             await usersRepository.UpdateAsync(existingItem);
