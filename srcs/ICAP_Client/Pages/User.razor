@@ -6,6 +6,7 @@
 @inject IAccessTokenProvider AuthorizationService
 @inject AccountServiceClient AccountServiceClient
 @inject NavigationManager Navmanager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ISnackbar Snackbar
 
 <h1>@AuthenticatedUser?.Identity?.Name</h1>
@@ -47,8 +48,6 @@
 }
 
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState> AuthenticationState { get; set; }
 
     public ClaimsPrincipal AuthenticatedUser { get; set; }
     public AccessToken? AccessToken { get; set; }
@@ -56,7 +55,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        var state = await AuthenticationState;
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var accessTokenResult = await AuthorizationService.RequestAccessToken();
 
         if (!accessTokenResult.TryGetToken(out var token))

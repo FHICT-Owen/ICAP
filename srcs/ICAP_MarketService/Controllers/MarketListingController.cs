@@ -2,7 +2,6 @@
 using ICAP_MarketService.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -30,7 +29,6 @@ namespace ICAP_MarketService.Controllers
         }
 
         [Authorize]
-        [RequiredScope("access_as_user")]
         [HttpPost]
         public async Task<ActionResult<MarketListing>> AddAsync(MarketListingDto reqData)
         {
@@ -46,7 +44,6 @@ namespace ICAP_MarketService.Controllers
         }
 
         [Authorize]
-        [RequiredScope("access_as_user")]
         [HttpPut("{id}")]
         public async Task<IActionResult> EditAsync(MarketListingDto reqData, string id)
         {
@@ -58,7 +55,6 @@ namespace ICAP_MarketService.Controllers
         }
 
         [Authorize]
-        [RequiredScope("access_as_user")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveAsync(string id)
         {

@@ -1,12 +1,11 @@
 ﻿using ICAP_AccountService.Entities;
+using ICAP_Infrastructure.MTDtos;
 using ICAP_Infrastructure.Repositories;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using ICAP_Infrastructure.MTDtos;
 
 namespace ICAP_AccountService.Controllers
 {
@@ -32,7 +31,6 @@ namespace ICAP_AccountService.Controllers
         }
 
         [Authorize]
-        [RequiredScope("access_as_user")]
         [HttpPost]
         public async Task<ActionResult<User>> PostAsync()
         {
@@ -59,7 +57,6 @@ namespace ICAP_AccountService.Controllers
         }
 
         [Authorize]
-        [RequiredScope("access_as_user")]
         [HttpPut]
         public async Task<IActionResult> PutAsync(UserDto data)
         {
@@ -79,7 +76,6 @@ namespace ICAP_AccountService.Controllers
         }
 
         [Authorize]
-        [RequiredScope("access_as_user")]
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync()
         {

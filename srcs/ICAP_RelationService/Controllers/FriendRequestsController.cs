@@ -2,14 +2,12 @@
 using ICAP_RelationService.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace ICAP_RelationService.Controllers
 {
     [Authorize]
-    [RequiredScope("access_as_user")]
     [ApiController]
     [Route("friendrequests")]
     public class FriendRequestsController(IRepository<FriendRequest> friendRequestsRepository) : ControllerBase
