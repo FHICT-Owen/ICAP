@@ -267,7 +267,24 @@ I decided to create a load test using Azure Load Testing that hits a get endpoin
 - GET: https://aks.odb-tech.com/market/listings
 - GET: https://aks.odb-tech.com/relations/friendrequests
 
-The test is set up to run on with 250 users per engine and a total of 6 engines at once. The stress test duration is 5 minutes with 1 minute of ramp up time. I made this test to verify that the Horizontal Pod Autoscaler will scale up pods when pods hit more than 10 requests per second per pod. Below is a video of how the pods scale up very agressively with the current Autoscaler and deployment settings. 
+The test is set up to run on with 250 users per engine and a total of 4 engines at once, which gives us 1000 users. The stress test duration is 10 minutes with 1 minute of ramp up time. I made this test to verify that the Horizontal Pod Autoscaler (HPA) will scale up pods when pods hit more than 10 requests per second per pod. Below is a video of how the pods scale up very agressively with the current Autoscaler and deployment settings. 
 
-<video src="./Media/2024-01-18 06-15-20.mp4" width="800" controls></video>
+Something to keep in mind is that the current node pool only has 5 nodes and each of those nodes has a VM attached with only 7GB of RAM and 2 CPU cores and thus 4 threads. The default HPA pod replicas are set to 2 per instance.
 
+![](./Media/Load_Test_Requests.png)
+
+Looking at the request results, there is an average throughput 1207.28 requests/s, with an average response time of 220ms in the 90th percentile. What is remarkable is that the requests going to the endpoint of the request service are remarkably high at 1.17 seconds, but this is due to the cluster having to scale up pods as the request time thereafter drops to about 220ms per request.
+
+The Error rate for the services is very very low for the 720k+ requests that were made, except for the account service. It is remarkably high at 13k errors. This errors are only HTTP status 500 errors, telling me that there is a bug in the code of the account service that is causing this high error rate. The other errors in the test are of type `org.apache.http.NoHttpResponseException`, which means there was a brief time where JMeter was unable get a response from the services. 
+
+![](./Media/Load_Test_Engine.png)
+
+Only right at the start, when pods need to be scaled up, does the kubernetes engine CPU usage spike shortly. It stabilizes at an average of 15% CPU usage to run Kubernetes, this means that the Engine can handle quite a few more pods. 
+
+If we extrapolate the data linearly then with the current Engine and service health and throughput it can be assumed that the application will only handle a maximum throughput of 8000 requests per second with 4 engine cpu instances. This would mean, that for handling 100.000 requests per second a total of 50 engine CPU instances are needed.
+
+As for the amount of pods needed to handle 100.000 requests per second we need to consider that when using `kubectl get hpa` during the test, the current HPA configuration was reporting ~250% CPU usage, where the target was 40%. Every pod instance is configured to use 0.5 CPU thread at max and the 5 virtual machines were reporting ~90% cpu usage on average. 
+
+![](./Media/HPA.png)
+
+Considering this, the amount of CPUs needed to host all of the pods at 100.000 requests per second would be ~1.000 CPU cores. There were a total of 45 service specific pods that were handling the requests, which would mean 4.500 pods are needed to scale to 100.000 requests per second.
