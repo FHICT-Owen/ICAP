@@ -1,12 +1,11 @@
 ﻿using ICAP_AccountService.Entities;
+using ICAP_Infrastructure.MTDtos;
 using ICAP_Infrastructure.Repositories;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using ICAP_Infrastructure.MTDtos;
 
 namespace ICAP_AccountService.Controllers
 {
@@ -14,24 +13,24 @@ namespace ICAP_AccountService.Controllers
     [Route("users")]
     public class UsersController(IRepository<User> usersRepository, IBus bus) : ControllerBase
     {
-        public record UserDto(string Name, string Email);
+        public record UserDto(string UserId, string GivenName, string Email);
 
         [HttpGet]
-        public async Task<IEnumerable<User>> GetAsync()
+        public async Task<IEnumerable<UserDto>> GetAsync()
         {
             var items = await usersRepository.GetAllAsync();
-            return items;
+            return items.Select(users => new UserDto(users.Id, users.Name, ""));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetByIdAsync(string id)
+        public async Task<ActionResult<UserDto>> GetByIdAsync(string id)
         {
             var item = await usersRepository.GetAsync(id);
-            return item;
+            if (item == null) return NotFound();
+            return new UserDto(item.Id, item.Name, "");
         }
 
         [Authorize]
-        [RequiredScope("access_as_user")]
         [HttpPost]
         public async Task<ActionResult<User>> PostAsync()
         {
@@ -58,7 +57,6 @@ namespace ICAP_AccountService.Controllers
         }
 
         [Authorize]
-        [RequiredScope("access_as_user")]
         [HttpPut]
         public async Task<IActionResult> PutAsync(UserDto data)
         {
@@ -69,7 +67,7 @@ namespace ICAP_AccountService.Controllers
 
             var existingItem = await usersRepository.GetAsync(oid);
             if (existingItem is null) return NotFound();
-            existingItem.Name = data.Name;
+            existingItem.Name = data.GivenName;
             existingItem.Email = data.Email;
             
             await usersRepository.UpdateAsync(existingItem);
@@ -78,7 +76,6 @@ namespace ICAP_AccountService.Controllers
         }
 
         [Authorize]
-        [RequiredScope("access_as_user")]
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync()
         {
