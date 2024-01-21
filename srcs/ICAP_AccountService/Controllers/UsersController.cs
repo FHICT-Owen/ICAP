@@ -1,15 +1,17 @@
 ﻿using ICAP_AccountService.Entities;
-using ICAP_Infrastructure.MTDtos;
 using ICAP_Infrastructure.Repositories;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using ICAP_Infrastructure.MTDtos;
 
 namespace ICAP_AccountService.Controllers
 {
     [ApiController]
+    [RequiredScope("access_as_user")]
     [Route("users")]
     public class UsersController(IRepository<User> usersRepository, IBus bus) : ControllerBase
     {
