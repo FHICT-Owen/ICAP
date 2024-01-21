@@ -256,7 +256,13 @@ The results from the test setup shown above are shown below, including the Acces
 ![Alt text](./Media/E2ETests_Result.png)
 
 ## Load Testing
-For load testing I decided to create a load test using Azure Load Testing that hit a get endpoint on each of my services. This test consists of the following requests:
+I used load testing within the project to validate if my Learning Outcome for scalable architectures is achievable. The specific non-functional requirement that should be validated using load testing is the one below:
+
+```
+The platform must be capable of supporting a minimum of 100,000 concurrent users engaged in activities without degradation of performance.
+```
+
+I decided to create a load test using Azure Load Testing that hits a get endpoint on each of my services. This test consists of the following requests:
 - GET: https://aks.odb-tech.com/accounts/users
 - GET: https://aks.odb-tech.com/market/listings
 - GET: https://aks.odb-tech.com/relations/friendrequests

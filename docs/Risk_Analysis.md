@@ -157,5 +157,33 @@ The use of Azure Key Vault makes sure that any secrets for the front- and back-e
 ## Non-functional requirements
 The following non-functional requirements were formulated based off the premise of this risk analysis.
 - ICAP must support role-based access control mechanisms to ensure that only authorized users can access specific functions based on their roles.
-- All sensitive data stored by the software, including user credentials and personal information, must be encrypted both at rest and in transit using industry-standard encryption algorithms.
-- All secret variables should be managed through a secret store or GitHub secrets.
+- All sensitive data, including user credentials and personal information, must be encrypted using advanced encryption standards (AES) with a minimum key length of 256 bits. This applies to both data at rest and in transit.
+- ICAP should utilize a centralized and secure vault for managing secrets, such as API keys, database credentials, and configuration settings, with strict access control and auditing capabilities. This goes for both the repository and the production environment.
+- Implement protections against cross-site scripting (XSS) and cross-site request forgery (CSRF) attacks to secure the application from common web vulnerabilities.
+- ICAP must utilize strong, multi-factor authentication mechanisms to mitigate risks associated with identification and authentication failures. This includes implementing account lockout mechanisms after a certain number of failed attempts and ensuring secure password recovery processes.
+- The application applies encryption to the communication of confidential information over non safe networks.
+
+## Validation of security-related non-functional requirements
+Due to time restrictions, only a few of the abovementioned non-functional requirements can be validated. These specifically covered non-functional requirements are mentioned below here in a section of their own.
+
+### StackHawk 
+StackHawk is a Dynamic Application Security Testing (DAST) tool that allows for the automation of testing applications in their running state to identify security vulnerabilities. StackHawk's DAST capabilities extend to a broad spectrum of vulnerabilities, including but not limited to:
+
+- SQL Injection
+- Cross-Site Scripting (XSS) 
+- Cross-Site Request Forgery (CSRF)
+- And a wide range of other vulnerabilities typically found in the OWASP Top 10 list
+
+Thus makint it possible to cover and mitigate a lot of the risks specifically mentioned in the OWASP Top 10 by actively scanning for these risks using StackHawk.
+
+### Applying encryption over non-safe networks
+In order to mitigate the risk involved with this requirement, an SSL certificate should be acquired so HTTPS is used across the entire project. In order to make sure HTTP is not still being used, any and all requests should also be automatically forwarded to HTTPS. For the AKS cluster this can be achieved by annotating the ingress resources with the `nginx.ingress.kubernetes.io/ssl-redirect: "true"` annotation. This then causes all traffic to be routed using HTTPS. Sending a request using http like doing a GET request to `http://aks.odb-tech.com/market/listings` results in an automatic redirect with HTTP status code 307 like below.
+
+![](./Media/HTTP_Redirect.png)
+
+Which in turn results into a request using HTTPS.
+
+![](./Media/HTTP_Redirect_Result.png)
+
+### Role-based access control
+
