@@ -54,7 +54,7 @@ namespace ICAP_MarketService.Controllers
             if (authorizationHeader.IsNullOrEmpty()) return BadRequest();
             var decodedToken = GetTokenFromAuthHeader(authorizationHeader);
             var oid = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
-            var isAdmin = decodedToken.Claims.First(claim => claim.Type == "roles").Value.Contains("access_as_admin");
+            var isAdmin = decodedToken.Claims.FirstOrDefault(claim => claim.Type == "roles")?.Value.Contains("access_as_admin") ?? false;
             var listing = await listings.GetListingAsync(id);
             if (listing?.UserId != oid || !isAdmin)
                 return Unauthorized("You can not edit a listing belonging to another user.");
@@ -74,7 +74,7 @@ namespace ICAP_MarketService.Controllers
             if (authorizationHeader.IsNullOrEmpty()) return BadRequest();
             var decodedToken = GetTokenFromAuthHeader(authorizationHeader);
             var oid = decodedToken.Claims.First(claim => claim.Type == "oid").Value;
-            var isAdmin = decodedToken.Claims.First(claim => claim.Type == "roles").Value.Contains("access_as_admin");
+            var isAdmin = decodedToken.Claims.FirstOrDefault(claim => claim.Type == "roles")?.Value.Contains("access_as_admin") ?? false;
             var listing = await listings.GetListingAsync(id);
             if (listing?.UserId != oid || !isAdmin)
                 return Unauthorized("You can not remove a listing belonging to another user.");
