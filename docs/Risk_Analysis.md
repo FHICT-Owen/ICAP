@@ -185,5 +185,7 @@ Which in turn results into a request using HTTPS.
 
 ![](./Media/HTTP_Redirect_Result.png)
 
-### Role-based access control
+### Role-based access control (RBAC)
+RBAC allows different actors within the application to have access to the resources and permissions that should specifically be tied to the tasks and data that are linked to that type of actor. ICAP's entire landscape of API endpoints is covered by Entra Authorization, with the exception of certain GET endpoints. An example of one such endpoint that has additional RBAC settings are the PUT and DELETE endpoints for the market listings. The endpoint is set up in such a way that it allows for admins to remove and edit listings of other users. The practical demonstration of this is shown in the video below here.
 
+<video src="./Media/DEMO-RBAC.mp4" width="800" controls></video>
