@@ -34,8 +34,10 @@ namespace ICAP_Playwright.Tests
             await page1.GetByPlaceholder("Email, phone, or Skype").ClickAsync();
             await page1.GetByRole(AriaRole.Button, new() { Name = "Next" }).ClickAsync();
             await page1.GetByPlaceholder("Password").FillAsync(_password);
-            await page1.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
-            await page1.WaitForLoadStateAsync();
+            await page1.RunAndWaitForRequestFinishedAsync(async () =>
+            {
+                await page1.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
+            });
             var buttonIsVisible = await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).IsVisibleAsync();
             if (buttonIsVisible) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
             await page1.RunAndWaitForRequestFinishedAsync(async () =>
@@ -66,8 +68,10 @@ namespace ICAP_Playwright.Tests
             await page1.GetByPlaceholder("Email, phone, or Skype").ClickAsync();
             await page1.GetByRole(AriaRole.Button, new() { Name = "Next" }).ClickAsync();
             await page1.GetByPlaceholder("Password").FillAsync(_password);
-            await page1.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
-            await page1.WaitForLoadStateAsync();
+            await page1.RunAndWaitForRequestFinishedAsync(async () =>
+            {
+                await page1.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
+            });
             var buttonIsVisible = await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).IsVisibleAsync();
             if (buttonIsVisible) await page1.GetByRole(AriaRole.Button, new() { Name = "Ask later" }).ClickAsync();
             await page1.RunAndWaitForRequestFinishedAsync(async () =>
